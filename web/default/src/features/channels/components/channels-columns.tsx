@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { stringToColor } from '@/lib/colors'
 import { getCurrencyLabel } from '@/lib/currency'
 import {
   formatTimestampToDate,
@@ -18,6 +19,8 @@ import {
 } from '@/lib/format'
 import { getLobeIcon } from '@/lib/lobe-icon'
 import { cn, truncateText } from '@/lib/utils'
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
+import { Badge, type BadgeColor } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -28,7 +31,6 @@ import {
 } from '@/components/ui/tooltip'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
-import { GroupBadge } from '@/components/group-badge'
 import {
   StatusBadge,
   dotColorMap,
@@ -98,13 +100,9 @@ function renderLimitedItems(
     <div className='flex max-w-full items-center gap-1 overflow-hidden'>
       {displayed}
       {remaining > 0 && (
-        <StatusBadge
-          label={`+${remaining}`}
-          variant='neutral'
-          size='sm'
-          copyable={false}
-          className='flex-shrink-0'
-        />
+        <Badge color='neutral' className='flex-shrink-0'>
+          +{remaining}
+        </Badge>
       )}
     </div>
   )
@@ -428,6 +426,7 @@ function BalanceCell({ channel }: { channel: Channel }) {
  */
 export function useChannelsColumns(): ColumnDef<Channel>[] {
   const { t } = useTranslation()
+  const { copyToClipboard } = useCopyToClipboard()
   return [
     // Checkbox column
     {
@@ -473,13 +472,16 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
       cell: ({ row }) => {
         const id = row.getValue('id') as number
         return (
-          <StatusBadge
-            label={String(id)}
-            variant='neutral'
-            copyText={String(id)}
-            size='sm'
-            className='font-mono'
-          />
+          <Badge
+            color='neutral'
+            className='font-mono cursor-pointer transition-opacity hover:opacity-70 active:scale-95'
+            onClick={(e) => {
+              e.stopPropagation()
+              copyToClipboard(String(id))
+            }}
+          >
+            {id}
+          </Badge>
         )
       },
       size: 80,
@@ -706,34 +708,25 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
         const status = row.getValue('status') as number
         const channel = row.original as Channel
 
-        // Tag row: show aggregated status
         if (isTagRow) {
           const childrenCount = (row.original as TagRow).children?.length || 0
           const hasEnabled = status === 1
 
           if (hasEnabled) {
             return (
-              <StatusBadge
-                label={`Active (${childrenCount})`}
-                variant='success'
-                showDot
-                size='sm'
-                copyable={false}
-              />
+              <Badge color='success'>
+                {t('Active')} ({childrenCount})
+              </Badge>
             )
           } else {
             return (
-              <StatusBadge
-                label={`Inactive (${childrenCount})`}
-                variant='neutral'
-                size='sm'
-                copyable={false}
-              />
+              <Badge color='neutral'>
+                {t('Inactive')} ({childrenCount})
+              </Badge>
             )
           }
         }
 
-        // Regular channel row
         const config =
           CHANNEL_STATUS_CONFIG[status as keyof typeof CHANNEL_STATUS_CONFIG] ||
           CHANNEL_STATUS_CONFIG[0]
@@ -749,7 +742,8 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
             ? `${t(config.label)} (${enabledCount}/${keySize})`
             : t(config.label)
 
-        // Auto-disabled: show reason and time tooltip
+        const badgeColor = config.variant as BadgeColor
+
         if (status === 3) {
           let statusReason = ''
           let statusTime = ''
@@ -773,13 +767,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span>
-                      <StatusBadge
-                        label={label}
-                        variant={config.variant}
-                        showDot={config.showDot}
-                        size='sm'
-                        copyable={false}
-                      />
+                      <Badge color={badgeColor}>{label}</Badge>
                     </span>
                   </TooltipTrigger>
                   <TooltipContent side='top' className='max-w-xs'>
@@ -802,15 +790,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
           }
         }
 
-        return (
-          <StatusBadge
-            label={label}
-            variant={config.variant}
-            showDot={config.showDot}
-            size='sm'
-            copyable={false}
-          />
-        )
+        return <Badge color={badgeColor}>{label}</Badge>
       },
       filterFn: (row, id, value) => {
         if (!value || value.length === 0 || value.includes('all')) return true
@@ -877,9 +857,26 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
         const group = row.getValue('group') as string
         const groupArray = parseGroupsList(group)
 
-        const groupBadges = groupArray.map((g) => (
-          <GroupBadge key={g} group={g} size='sm' />
-        ))
+        const groupBadges = groupArray.map((g) => {
+          const groupName = g.trim()
+          const isAutoGroup = groupName === 'auto'
+          const isEmptyGroup = !groupName
+          const isSpecialGroup = isAutoGroup || isEmptyGroup
+          const label = isEmptyGroup
+            ? t('User Group')
+            : isAutoGroup
+              ? t('Auto')
+              : groupName
+          const color: BadgeColor = isSpecialGroup
+            ? 'neutral'
+            : (stringToColor(groupName) as BadgeColor)
+
+          return (
+            <Badge key={g} color={color}>
+              {label}
+            </Badge>
+          )
+        })
 
         return (
           <TooltipProvider>
