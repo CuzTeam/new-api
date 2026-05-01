@@ -27,6 +27,8 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useSidebar } from './ui/sidebar'
+import { ThemeColorConfig } from '@/components/theme-color-picker'
+import { useThemeColor } from '@/context/theme-color-provider'
 
 export function ConfigDrawer() {
   const { t } = useTranslation()
@@ -34,12 +36,14 @@ export function ConfigDrawer() {
   const { resetDir } = useDirection()
   const { resetTheme } = useTheme()
   const { resetLayout } = useLayout()
+  const { resetHue } = useThemeColor()
 
   const handleReset = () => {
     setOpen(true)
     resetDir()
     resetTheme()
     resetLayout()
+    resetHue()
   }
 
   return (
@@ -64,6 +68,7 @@ export function ConfigDrawer() {
         </SheetHeader>
         <div className='space-y-6 overflow-y-auto px-4'>
           <ThemeConfig />
+          <ThemeColorConfig />
           <SidebarConfig />
           <LayoutConfig />
           <DirConfig />
