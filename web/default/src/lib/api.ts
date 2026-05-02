@@ -201,6 +201,18 @@ export async function getNotice(): Promise<{
   return res.data
 }
 
+export async function getBanner(): Promise<{
+  success: boolean
+  message?: string
+  data?: {
+    content: string
+    background_color: string
+  }
+}> {
+  const res = await api.get('/api/banner')
+  return res.data
+}
+
 // ----------------------------------------------------------------------------
 // 2FA Management APIs
 // ----------------------------------------------------------------------------

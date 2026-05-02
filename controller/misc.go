@@ -179,6 +179,20 @@ func GetNotice(c *gin.Context) {
 	return
 }
 
+func GetBanner(c *gin.Context) {
+	common.OptionMapRWMutex.RLock()
+	defer common.OptionMapRWMutex.RUnlock()
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data": gin.H{
+			"content":         common.OptionMap["BannerContent"],
+			"background_color": common.OptionMap["BannerBackgroundColor"],
+		},
+	})
+	return
+}
+
 func GetAbout(c *gin.Context) {
 	common.OptionMapRWMutex.RLock()
 	defer common.OptionMapRWMutex.RUnlock()

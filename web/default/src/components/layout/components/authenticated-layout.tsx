@@ -5,6 +5,7 @@ import { SearchProvider } from '@/context/search-provider'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { AnimatedOutlet } from '@/components/page-transition'
 import { SkipToMain } from '@/components/skip-to-main'
+import { TopBanner } from '@/components/top-banner'
 import { WorkspaceProvider } from '../context/workspace-context'
 import { AppSidebar } from './app-sidebar'
 
@@ -29,6 +30,7 @@ export function AuthenticatedLayout(props: AuthenticatedLayoutProps) {
                 'peer-data-[variant=inset]:h-[calc(100svh-(var(--spacing)*4))]'
               )}
             >
+              <TopBanner />
               {props.children ?? <AnimatedOutlet />}
             </SidebarInset>
           </SidebarProvider>

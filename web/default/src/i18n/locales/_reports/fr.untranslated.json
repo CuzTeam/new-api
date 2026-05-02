@@ -1,5 +1,6 @@
 {
-  "Go to Settings": "Go to Settings",
-  "Failed to adjust quota": "Failed to adjust quota",
-  "Select an operation mode and enter the amount": "Select an operation mode and enter the amount"
+  "A text banner displayed at the top of all pages. Leave empty to disable.": "A text banner displayed at the top of all pages. Leave empty to disable.",
+  "e.g., #ff0000 or linear-gradient(to right, #ff0000, #0000ff)": "e.g., #ff0000 or linear-gradient(to right, #ff0000, #0000ff)",
+  "Enter banner content to display at the top of the page": "Enter banner content to display at the top of the page",
+  "Supports solid colors (e.g., #ff0000) or CSS gradients (e.g., linear-gradient(...)). Leave empty for default theme color.": "Supports solid colors (e.g., #ff0000) or CSS gradients (e.g., linear-gradient(...)). Leave empty for default theme color."
 }

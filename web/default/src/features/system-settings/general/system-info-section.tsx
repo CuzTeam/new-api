@@ -33,6 +33,8 @@ const _systemInfoSchema = z.object({
     frontend: z.enum(['default', 'classic']),
   }),
   Notice: z.string().optional(),
+  BannerContent: z.string().optional(),
+  BannerBackgroundColor: z.string().optional(),
   SystemName: z.string().min(1),
   ServerAddress: z.string().optional(),
   Logo: z.string().url().optional().or(z.literal('')),
@@ -66,6 +68,8 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
         defaultValues.theme?.frontend === 'classic' ? 'classic' : 'default',
     },
     Notice: normalizeValue(defaultValues.Notice),
+    BannerContent: normalizeValue(defaultValues.BannerContent),
+    BannerBackgroundColor: normalizeValue(defaultValues.BannerBackgroundColor),
     SystemName: normalizeValue(defaultValues.SystemName),
     ServerAddress: normalizeValue(defaultValues.ServerAddress),
     Logo: normalizeValue(defaultValues.Logo),
@@ -83,6 +87,8 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
       frontend: z.enum(['default', 'classic']),
     }),
     Notice: z.string().optional(),
+    BannerContent: z.string().optional(),
+    BannerBackgroundColor: z.string().optional(),
     SystemName: z.string().min(1, {
       error: () => t('System name is required'),
     }),
@@ -179,6 +185,55 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                   <FormDescription>
                     {t(
                       'Announcement displayed to users (supports Markdown & HTML)'
+                    )}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='BannerContent'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('Banner Content')}</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder={t(
+                        'Enter banner content to display at the top of the page'
+                      )}
+                      rows={3}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {t(
+                      'A text banner displayed at the top of all pages. Leave empty to disable.'
+                    )}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='BannerBackgroundColor'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('Banner Background Color')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t(
+                        'e.g., #ff0000 or linear-gradient(to right, #ff0000, #0000ff)'
+                      )}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {t(
+                      'Supports solid colors (e.g., #ff0000) or CSS gradients (e.g., linear-gradient(...)). Leave empty for default theme color.'
                     )}
                   </FormDescription>
                   <FormMessage />

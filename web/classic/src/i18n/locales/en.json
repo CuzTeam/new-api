@@ -2239,7 +2239,7 @@
     "注 册": "Sign Up",
     "注册": "Sign up",
     "注册 Passkey": "Register Passkey",
-    "注册时自动启用“接受未定价模型”": "Auto-Accept Unpriced Models on Registration",
+    "注册时自动启用"接受未定价模型"": "Auto-Accept Unpriced Models on Registration",
     "注意": "Note",
     "注意：JSON中重复的键只会保留最后一个同名键的值": "Note: In JSON, duplicate keys will only keep the value of the last key with the same name",
     "注意非Chat API，请务必填写正确的API地址，否则可能导致无法使用": "Note: For non-Chat API, please make sure to enter the correct API address, otherwise it may not work",
