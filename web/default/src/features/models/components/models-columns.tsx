@@ -10,8 +10,9 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
-import { GroupBadge } from '@/components/group-badge'
-import { StatusBadge } from '@/components/status-badge'
+import { stringToColor } from '@/lib/colors'
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
+import { Badge, type BadgeColor } from '@/components/ui/badge'
 import {
   getModelStatusConfig,
   getNameRuleConfig,
@@ -39,13 +40,9 @@ function renderLimitedItems(
     <div className='flex max-w-full items-center gap-1 overflow-x-auto'>
       {displayed}
       {remaining > 0 && (
-        <StatusBadge
-          label={`+${remaining}`}
-          variant='neutral'
-          size='sm'
-          copyable={false}
-          className='flex-shrink-0'
-        />
+        <Badge color='neutral' className='flex-shrink-0'>
+          +{remaining}
+        </Badge>
       )}
     </div>
   )
@@ -56,6 +53,7 @@ function renderLimitedItems(
  */
 export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
   const { t } = useTranslation()
+  const { copyToClipboard } = useCopyToClipboard()
 
   // Get translated configs
   const NAME_RULE_CONFIG = getNameRuleConfig(t)
@@ -103,13 +101,16 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
       cell: ({ row }) => {
         const id = row.getValue('id') as number
         return (
-          <StatusBadge
-            label={String(id)}
-            variant='neutral'
-            copyText={String(id)}
-            size='sm'
-            className='font-mono'
-          />
+          <Badge
+            color='neutral'
+            className='font-mono cursor-pointer transition-opacity hover:opacity-70 active:scale-95'
+            onClick={(e) => {
+              e.stopPropagation()
+              copyToClipboard(String(id))
+            }}
+          >
+            {id}
+          </Badge>
         )
       },
       size: 80,
@@ -145,13 +146,16 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
       cell: ({ row }) => {
         const name = row.getValue('model_name') as string
         return (
-          <StatusBadge
-            label={name}
-            variant='neutral'
-            copyText={name}
-            size='sm'
-            className='font-mono'
-          />
+          <Badge
+            color='neutral'
+            className='font-mono cursor-pointer transition-opacity hover:opacity-70 active:scale-95'
+            onClick={(e) => {
+              e.stopPropagation()
+              copyToClipboard(name)
+            }}
+          >
+            {name}
+          </Badge>
         )
       },
       minSize: 200,
@@ -175,18 +179,11 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
         }
 
         const badge = (
-          <StatusBadge
-            label={label}
-            variant={
-              (config.color === 'error' ? 'danger' : config.color) as
-                | 'neutral'
-                | 'success'
-                | 'warning'
-                | 'danger'
-                | 'info'
-            }
-            size='sm'
-          />
+          <Badge
+            color={(config.color === 'error' ? 'danger' : config.color) as BadgeColor}
+          >
+            {label}
+          </Badge>
         )
 
         // Show tooltip with matched models for non-exact rules
@@ -196,7 +193,7 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
           model.matched_models.length > 0
         ) {
           const matchedBadges = model.matched_models.map((m, idx) => (
-            <StatusBadge key={idx} label={m} autoColor={m} size='sm' />
+            <Badge key={idx} color={stringToColor(m) as BadgeColor}>{m}</Badge>
           ))
 
           return (
@@ -233,13 +230,7 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
           MODEL_STATUS_CONFIG[status as 0 | 1] || MODEL_STATUS_CONFIG[0]
 
         return (
-          <StatusBadge
-            label={config.label}
-            variant={config.variant}
-            showDot={config.showDot}
-            size='sm'
-            copyable={false}
-          />
+          <Badge color={config.variant as BadgeColor}>{config.label}</Badge>
         )
       },
       filterFn: (row, id, value) => {
@@ -271,11 +262,7 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
         return (
           <div className='flex items-center gap-1.5'>
             {icon}
-            <StatusBadge
-              label={vendor.name}
-              autoColor={vendor.name}
-              size='sm'
-            />
+            <Badge color={stringToColor(vendor.name) as BadgeColor}>{vendor.name}</Badge>
           </div>
         )
       },
@@ -318,7 +305,7 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
         }
 
         const tagBadges = tagArray.map((tag, idx) => (
-          <StatusBadge key={idx} label={tag} autoColor={tag} size='sm' />
+          <Badge key={idx} color={stringToColor(tag) as BadgeColor}>{tag}</Badge>
         ))
 
         return (
@@ -357,7 +344,7 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
         }
 
         const endpointBadges = endpointArray.map((ep, idx) => (
-          <StatusBadge key={idx} label={ep} autoColor={ep} size='sm' />
+          <Badge key={idx} color={stringToColor(ep) as BadgeColor}>{ep}</Badge>
         ))
 
         return (
@@ -400,12 +387,9 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
         }
 
         const channelBadges = channels.map((c, idx) => (
-          <StatusBadge
-            key={idx}
-            label={`${c.name} (${c.type})`}
-            autoColor={c.name}
-            size='sm'
-          />
+          <Badge key={idx} color={stringToColor(c.name) as BadgeColor}>
+            {c.name} ({c.type})
+          </Badge>
         ))
 
         return (
@@ -444,9 +428,24 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
           return <span className='text-muted-foreground text-xs'>-</span>
         }
 
-        const groupBadges = groups.map((g) => (
-          <GroupBadge key={g} group={g} size='sm' />
-        ))
+        const groupBadges = groups.map((g) => {
+          const groupName = g.trim()
+          const isAutoGroup = groupName === 'auto'
+          const isEmptyGroup = !groupName
+          const isSpecialGroup = isAutoGroup || isEmptyGroup
+          const label = isEmptyGroup
+            ? t('User Group')
+            : isAutoGroup
+              ? t('Auto')
+              : groupName
+          const color: BadgeColor = isSpecialGroup
+            ? 'neutral'
+            : (stringToColor(groupName) as BadgeColor)
+
+          return (
+            <Badge key={g} color={color}>{label}</Badge>
+          )
+        })
 
         return (
           <TooltipProvider>
@@ -485,19 +484,12 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
         const quotaBadges = quotaTypes.map((qt, idx) => {
           const config = QUOTA_TYPE_CONFIG[qt]
           return (
-            <StatusBadge
+            <Badge
               key={idx}
-              label={config?.label || String(qt)}
-              variant={
-                (config?.color === 'error' ? 'danger' : config?.color) as
-                  | 'neutral'
-                  | 'success'
-                  | 'warning'
-                  | 'danger'
-                  | 'info'
-              }
-              size='sm'
-            />
+              color={(config?.color === 'error' ? 'danger' : config?.color) as BadgeColor}
+            >
+              {config?.label || String(qt)}
+            </Badge>
           )
         })
 
@@ -531,12 +523,9 @@ export function useModelsColumns(vendors: Vendor[] = []): ColumnDef<Model>[] {
       cell: ({ row }) => {
         const syncOfficial = row.getValue('sync_official') as number
         return (
-          <StatusBadge
-            label={syncOfficial === 1 ? t('Official Sync') : t('No Sync')}
-            variant={syncOfficial === 1 ? 'success' : 'warning'}
-            size='sm'
-            copyable={false}
-          />
+          <Badge color={syncOfficial === 1 ? 'success' : 'warning'}>
+            {syncOfficial === 1 ? t('Official Sync') : t('No Sync')}
+          </Badge>
         )
       },
       filterFn: (row, id, value) => {
