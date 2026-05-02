@@ -24,7 +24,7 @@ export function AvailabilityButton({ className }: { className?: string }) {
   const { data, isLoading, error } = useQuery({
     queryKey: ['availability'],
     queryFn: () => getAvailabilityStats(),
-    enabled: open && enabled,
+    enabled: open,
   })
 
   if (!enabled) return null
