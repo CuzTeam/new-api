@@ -186,8 +186,9 @@ func GetBanner(c *gin.Context) {
 		"success": true,
 		"message": "",
 		"data": gin.H{
-			"content":         common.OptionMap["BannerContent"],
+			"content":          common.OptionMap["BannerContent"],
 			"background_color": common.OptionMap["BannerBackgroundColor"],
+			"font_color":       common.OptionMap["BannerFontColor"],
 		},
 	})
 	return

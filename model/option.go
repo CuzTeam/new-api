@@ -66,6 +66,7 @@ func InitOptionMap() {
 	common.OptionMap["Notice"] = ""
 	common.OptionMap["BannerContent"] = ""
 	common.OptionMap["BannerBackgroundColor"] = ""
+	common.OptionMap["BannerFontColor"] = ""
 	common.OptionMap["About"] = ""
 	common.OptionMap["HomePageContent"] = ""
 	common.OptionMap["Footer"] = common.Footer

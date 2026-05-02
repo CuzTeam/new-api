@@ -33,6 +33,9 @@ export function TopBanner() {
   const backgroundColor = bannerResponse?.success
     ? (bannerResponse.data?.background_color || '').trim()
     : ''
+  const fontColor = bannerResponse?.success
+    ? (bannerResponse.data?.font_color || '').trim()
+    : ''
 
   const contentHash = hashString(content)
 
@@ -64,10 +67,14 @@ export function TopBanner() {
     return { backgroundColor }
   })()
 
+  const fontColorStyle: React.CSSProperties = fontColor
+    ? { color: fontColor }
+    : { color: 'hsl(var(--primary-foreground))' }
+
   return (
     <div
-      className='relative flex items-center px-4 py-1.5 text-sm text-primary-foreground'
-      style={bgStyle}
+      className='relative flex items-center px-4 py-1.5 text-sm'
+      style={{ ...bgStyle, ...fontColorStyle }}
     >
       <div
         ref={containerRef}

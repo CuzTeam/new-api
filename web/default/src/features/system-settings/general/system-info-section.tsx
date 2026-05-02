@@ -35,6 +35,7 @@ const _systemInfoSchema = z.object({
   Notice: z.string().optional(),
   BannerContent: z.string().optional(),
   BannerBackgroundColor: z.string().optional(),
+  BannerFontColor: z.string().optional(),
   SystemName: z.string().min(1),
   ServerAddress: z.string().optional(),
   Logo: z.string().url().optional().or(z.literal('')),
@@ -70,6 +71,7 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
     Notice: normalizeValue(defaultValues.Notice),
     BannerContent: normalizeValue(defaultValues.BannerContent),
     BannerBackgroundColor: normalizeValue(defaultValues.BannerBackgroundColor),
+    BannerFontColor: normalizeValue(defaultValues.BannerFontColor),
     SystemName: normalizeValue(defaultValues.SystemName),
     ServerAddress: normalizeValue(defaultValues.ServerAddress),
     Logo: normalizeValue(defaultValues.Logo),
@@ -89,6 +91,7 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
     Notice: z.string().optional(),
     BannerContent: z.string().optional(),
     BannerBackgroundColor: z.string().optional(),
+    BannerFontColor: z.string().optional(),
     SystemName: z.string().min(1, {
       error: () => t('System name is required'),
     }),
@@ -243,6 +246,28 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
 
             <FormField
               control={form.control}
+              name='BannerFontColor'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('Banner Font Color')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t('e.g., #ffffff or white')}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {t(
+                      'Font color for the banner text. Supports any CSS color value. Leave empty for default.'
+                    )}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name='SystemName'
               render={({ field }) => (
                 <FormItem>
@@ -265,7 +290,7 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                 <FormItem>
                   <FormLabel>{t('Server Address')}</FormLabel>
                   <FormControl>
-                    <Input placeholder='https://yourdomain.com' {...field} />
+                    <Input placeholder={t('https://yourdomain.com')} {...field} />
                   </FormControl>
                   <FormDescription>
                     {t(

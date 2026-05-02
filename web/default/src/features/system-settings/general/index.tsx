@@ -11,6 +11,9 @@ import {
 const defaultGeneralSettings: GeneralSettings = {
   'theme.frontend': 'default',
   Notice: '',
+  BannerContent: '',
+  BannerBackgroundColor: '',
+  BannerFontColor: '',
   SystemName: 'New API',
   Logo: '',
   Footer: '',

@@ -30,6 +30,9 @@ export type DeleteLogsResponse = {
 export type GeneralSettings = {
   'theme.frontend': string
   Notice: string
+  BannerContent: string
+  BannerBackgroundColor: string
+  BannerFontColor: string
   SystemName: string
   Logo: string
   Footer: string

@@ -207,6 +207,7 @@ export async function getBanner(): Promise<{
   data?: {
     content: string
     background_color: string
+    font_color: string
   }
 }> {
   const res = await api.get('/api/banner')
