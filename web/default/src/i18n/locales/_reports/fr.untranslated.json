@@ -1,8 +1,11 @@
 {
   "A text banner displayed at the top of all pages. Leave empty to disable.": "A text banner displayed at the top of all pages. Leave empty to disable.",
-  "e.g., #ffffff or white": "e.g., #ffffff or white",
-  "Font color for the banner text. Supports any CSS color value. Leave empty for default.": "Font color for the banner text. Supports any CSS color value. Leave empty for default.",
-  "e.g., #ff0000 or linear-gradient(to right, #ff0000, #0000ff)": "e.g., #ff0000 or linear-gradient(to right, #ff0000, #0000ff)",
+  "Add animation effects to the banner background.": "Add animation effects to the banner background.",
+  "Choose a preset effect and customize colors and speed.": "Choose a preset effect and customize colors and speed.",
+  "Comma-separated color values for the gradient.": "Comma-separated color values for the gradient.",
+  "Configure the banner background style.": "Configure the banner background style.",
   "Enter banner content to display at the top of the page": "Enter banner content to display at the top of the page",
-  "Supports solid colors (e.g., #ff0000) or CSS gradients (e.g., linear-gradient(...)). Leave empty for default theme color.": "Supports solid colors (e.g., #ff0000) or CSS gradients (e.g., linear-gradient(...)). Leave empty for default theme color."
+  "Font color for the banner text. Supports any CSS color value. Leave empty for default.": "Font color for the banner text. Supports any CSS color value. Leave empty for default.",
+  "Write custom CSS for the banner background. CSS is scoped to .top-banner.": "Write custom CSS for the banner background. CSS is scoped to .top-banner.",
+  "e.g., #ffffff or white": "e.g., #ffffff or white"
 }

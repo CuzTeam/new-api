@@ -65,7 +65,12 @@ func InitOptionMap() {
 	common.OptionMap["SMTPForceAuthLogin"] = strconv.FormatBool(common.SMTPForceAuthLogin)
 	common.OptionMap["Notice"] = ""
 	common.OptionMap["BannerContent"] = ""
-	common.OptionMap["BannerBackgroundColor"] = ""
+	common.OptionMap["BannerMode"] = ""
+	common.OptionMap["BannerPreset"] = ""
+	common.OptionMap["BannerColors"] = ""
+	common.OptionMap["BannerSpeed"] = "medium"
+	common.OptionMap["BannerVisualConfig"] = ""
+	common.OptionMap["BannerCustomCSS"] = ""
 	common.OptionMap["BannerFontColor"] = ""
 	common.OptionMap["About"] = ""
 	common.OptionMap["HomePageContent"] = ""

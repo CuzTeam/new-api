@@ -22,11 +22,41 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Slider } from '@/components/ui/slider'
 import { FormDirtyIndicator } from '../components/form-dirty-indicator'
 import { FormNavigationGuard } from '../components/form-navigation-guard'
 import { SettingsSection } from '../components/settings-section'
 import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
+
+const flowTemplate = `background: linear-gradient(270deg, #ff0000, #0000ff);
+background-size: 400% 400%;
+animation: banner-flow 8s ease infinite;`
+
+const pulseTemplate = `animation: banner-pulse 2s ease-in-out infinite;`
+
+const shimmerTemplate = `position: relative;
+overflow: hidden;
+.banner-preset-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  animation: banner-shimmer 3s infinite;
+}`
+
+const rainbowTemplate = `animation: banner-rainbow 8s linear infinite;`
 
 const _systemInfoSchema = z.object({
   theme: z.object({
@@ -34,7 +64,12 @@ const _systemInfoSchema = z.object({
   }),
   Notice: z.string().optional(),
   BannerContent: z.string().optional(),
-  BannerBackgroundColor: z.string().optional(),
+  BannerMode: z.string().optional(),
+  BannerPreset: z.string().optional(),
+  BannerColors: z.string().optional(),
+  BannerSpeed: z.string().optional(),
+  BannerVisualConfig: z.string().optional(),
+  BannerCustomCSS: z.string().optional(),
   BannerFontColor: z.string().optional(),
   SystemName: z.string().min(1),
   ServerAddress: z.string().optional(),
@@ -70,7 +105,12 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
     },
     Notice: normalizeValue(defaultValues.Notice),
     BannerContent: normalizeValue(defaultValues.BannerContent),
-    BannerBackgroundColor: normalizeValue(defaultValues.BannerBackgroundColor),
+    BannerMode: normalizeValue(defaultValues.BannerMode),
+    BannerPreset: normalizeValue(defaultValues.BannerPreset),
+    BannerColors: normalizeValue(defaultValues.BannerColors),
+    BannerSpeed: normalizeValue(defaultValues.BannerSpeed) || 'medium',
+    BannerVisualConfig: normalizeValue(defaultValues.BannerVisualConfig),
+    BannerCustomCSS: normalizeValue(defaultValues.BannerCustomCSS),
     BannerFontColor: normalizeValue(defaultValues.BannerFontColor),
     SystemName: normalizeValue(defaultValues.SystemName),
     ServerAddress: normalizeValue(defaultValues.ServerAddress),
@@ -90,7 +130,12 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
     }),
     Notice: z.string().optional(),
     BannerContent: z.string().optional(),
-    BannerBackgroundColor: z.string().optional(),
+    BannerMode: z.string().optional(),
+    BannerPreset: z.string().optional(),
+    BannerColors: z.string().optional(),
+    BannerSpeed: z.string().optional(),
+    BannerVisualConfig: z.string().optional(),
+    BannerCustomCSS: z.string().optional(),
     BannerFontColor: z.string().optional(),
     SystemName: z.string().min(1, {
       error: () => t('System name is required'),
@@ -128,6 +173,8 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
       },
     })
 
+  const bannerMode = form.watch('BannerMode') || 'preset'
+
   return (
     <>
       <FormNavigationGuard when={isDirty} />
@@ -137,7 +184,7 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
         description={t('Configure basic system information and branding')}
       >
         <Form {...form}>
-          <form onSubmit={handleSubmit} className='space-y-6'>
+          <form onSubmit={handleSubmit} className='flex flex-col gap-6'>
             <FormDirtyIndicator isDirty={isDirty} />
             <FormField
               control={form.control}
@@ -222,27 +269,405 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
 
             <FormField
               control={form.control}
-              name='BannerBackgroundColor'
+              name='BannerMode'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Banner Background Color')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t(
-                        'e.g., #ff0000 or linear-gradient(to right, #ff0000, #0000ff)'
-                      )}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t(
-                      'Supports solid colors (e.g., #ff0000) or CSS gradients (e.g., linear-gradient(...)). Leave empty for default theme color.'
-                    )}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                <input type='hidden' {...field} />
               )}
             />
+
+            <Tabs
+              value={bannerMode}
+              onValueChange={(v) => form.setValue('BannerMode', v, { shouldDirty: true })}
+            >
+              <TabsList className='w-full'>
+                <TabsTrigger value='preset' className='flex-1'>
+                  {t('Preset')}
+                </TabsTrigger>
+                <TabsTrigger value='visual' className='flex-1'>
+                  {t('Visual')}
+                </TabsTrigger>
+                <TabsTrigger value='code' className='flex-1'>
+                  {t('Code')}
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value='preset' className='mt-4'>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{t('Preset Background')}</CardTitle>
+                    <CardDescription>
+                      {t('Choose a preset effect and customize colors and speed.')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className='flex flex-col gap-4'>
+                    <FormField
+                      control={form.control}
+                      name='BannerPreset'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('Effect')}</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value || 'flow'}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value='flow'>{t('Flowing Gradient')}</SelectItem>
+                              <SelectItem value='pulse'>{t('Pulse')}</SelectItem>
+                              <SelectItem value='shimmer'>{t('Shimmer')}</SelectItem>
+                              <SelectItem value='rainbow'>{t('Rainbow')}</SelectItem>
+                              <SelectItem value='solid'>{t('Solid Color')}</SelectItem>
+                              <SelectItem value='gradient'>{t('Static Gradient')}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='BannerColors'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('Colors')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder={t('e.g., #ff0000,#0000ff')}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            {t('Comma-separated color values. First color is used for solid mode.')}
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='BannerSpeed'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('Speed')}</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value || 'medium'}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value='slow'>{t('Slow')}</SelectItem>
+                              <SelectItem value='medium'>{t('Medium')}</SelectItem>
+                              <SelectItem value='fast'>{t('Fast')}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value='visual' className='mt-4'>
+                <div className='flex flex-col gap-4'>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>{t('Background')}</CardTitle>
+                      <CardDescription>
+                        {t('Configure the banner background style.')}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className='flex flex-col gap-4'>
+                      <FormField
+                        control={form.control}
+                        name='BannerVisualConfig'
+                        render={({ field }) => {
+                          let config: {
+                            background?: { type: string; direction?: string; stops?: Array<{ color: string; position: number }> }
+                            animation?: { type: string; duration?: number; direction?: string; size?: number }
+                          } = {}
+                          try { config = JSON.parse(field.value || '{}') } catch { /* empty */ }
+
+                          const updateConfig = (updates: Record<string, unknown>) => {
+                            const newConfig = { ...config, ...updates }
+                            field.onChange(JSON.stringify(newConfig))
+                          }
+
+                          return (
+                            <>
+                              <FormItem>
+                                <FormLabel>{t('Background Type')}</FormLabel>
+                                <Select
+                                  value={config.background?.type || 'solid'}
+                                  onValueChange={(v) =>
+                                    updateConfig({
+                                      background: {
+                                        ...config.background,
+                                        type: v,
+                                        stops: config.background?.stops || [{ color: '#3b82f6', position: 0 }, { color: '#8b5cf6', position: 100 }],
+                                        direction: config.background?.direction || 'to right',
+                                      },
+                                    })
+                                  }
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value='solid'>{t('Solid')}</SelectItem>
+                                    <SelectItem value='gradient'>{t('Gradient')}</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormItem>
+
+                              {config.background?.type === 'gradient' && (
+                                <FormItem>
+                                  <FormLabel>{t('Direction')}</FormLabel>
+                                  <Select
+                                    value={config.background?.direction || 'to right'}
+                                    onValueChange={(v) =>
+                                      updateConfig({
+                                        background: { ...config.background, direction: v },
+                                      })
+                                    }
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value='to right'>{t('→ Right')}</SelectItem>
+                                      <SelectItem value='to left'>{t('← Left')}</SelectItem>
+                                      <SelectItem value='to bottom'>{t('↓ Down')}</SelectItem>
+                                      <SelectItem value='to top'>{t('↑ Up')}</SelectItem>
+                                      <SelectItem value='to bottom right'>{t('↘ Diagonal')}</SelectItem>
+                                      <SelectItem value='circle'>{t('⊙ Radial')}</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </FormItem>
+                              )}
+
+                              <FormItem>
+                                <FormLabel>{t('Color Stops')}</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder={t('e.g., #3b82f6,#8b5cf6')}
+                                    value={(config.background?.stops || []).map((s: { color: string }) => s.color).join(',')}
+                                    onChange={(e) => {
+                                      const colors = e.target.value.split(',').map((c) => c.trim()).filter(Boolean)
+                                      const stops = colors.map((color, i) => ({
+                                        color,
+                                        position: colors.length === 1 ? 0 : Math.round((i / (colors.length - 1)) * 100),
+                                      }))
+                                      updateConfig({
+                                        background: { ...config.background, stops },
+                                      })
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  {t('Comma-separated color values for the gradient.')}
+                                </FormDescription>
+                              </FormItem>
+                            </>
+                          )
+                        }}
+                      />
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>{t('Animation')}</CardTitle>
+                      <CardDescription>
+                        {t('Add animation effects to the banner background.')}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className='flex flex-col gap-4'>
+                      <FormField
+                        control={form.control}
+                        name='BannerVisualConfig'
+                        render={({ field }) => {
+                          let config: {
+                            background?: { type: string; direction?: string; stops?: Array<{ color: string; position: number }> }
+                            animation?: { type: string; duration?: number; direction?: string; size?: number }
+                          } = {}
+                          try { config = JSON.parse(field.value || '{}') } catch { /* empty */ }
+
+                          const updateConfig = (updates: Record<string, unknown>) => {
+                            const newConfig = { ...config, ...updates }
+                            field.onChange(JSON.stringify(newConfig))
+                          }
+
+                          return (
+                            <>
+                              <FormItem>
+                                <FormLabel>{t('Animation Type')}</FormLabel>
+                                <Select
+                                  value={config.animation?.type || 'none'}
+                                  onValueChange={(v) =>
+                                    updateConfig({
+                                      animation: {
+                                        type: v,
+                                        duration: config.animation?.duration || 8,
+                                        direction: config.animation?.direction || 'normal',
+                                        size: config.animation?.size || 400,
+                                      },
+                                    })
+                                  }
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value='none'>{t('None')}</SelectItem>
+                                    <SelectItem value='flow'>{t('Flow')}</SelectItem>
+                                    <SelectItem value='pulse'>{t('Pulse')}</SelectItem>
+                                    <SelectItem value='blink'>{t('Blink')}</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormItem>
+
+                              {config.animation?.type && config.animation.type !== 'none' && (
+                                <>
+                                  <FormItem>
+                                    <FormLabel>{t('Duration')}: {config.animation?.duration || 8}s</FormLabel>
+                                    <Slider
+                                      value={[config.animation?.duration || 8]}
+                                      onValueChange={([v]) =>
+                                        updateConfig({
+                                          animation: { ...config.animation, duration: v },
+                                        })
+                                      }
+                                      min={1}
+                                      max={20}
+                                      step={1}
+                                    />
+                                  </FormItem>
+
+                                  <FormItem>
+                                    <FormLabel>{t('Direction')}</FormLabel>
+                                    <Select
+                                      value={config.animation?.direction || 'normal'}
+                                      onValueChange={(v) =>
+                                        updateConfig({
+                                          animation: { ...config.animation, direction: v },
+                                        })
+                                      }
+                                    >
+                                      <FormControl>
+                                        <SelectTrigger>
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent>
+                                        <SelectItem value='normal'>{t('Normal')}</SelectItem>
+                                        <SelectItem value='reverse'>{t('Reverse')}</SelectItem>
+                                        <SelectItem value='alternate'>{t('Alternate')}</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </FormItem>
+
+                                  {config.animation?.type === 'flow' && (
+                                    <FormItem>
+                                      <FormLabel>{t('Intensity')}: {config.animation?.size || 400}%</FormLabel>
+                                      <Slider
+                                        value={[config.animation?.size || 400]}
+                                        onValueChange={([v]) =>
+                                          updateConfig({
+                                            animation: { ...config.animation, size: v },
+                                          })
+                                        }
+                                        min={100}
+                                        max={800}
+                                        step={50}
+                                      />
+                                    </FormItem>
+                                  )}
+                                </>
+                              )}
+                            </>
+                          )
+                        }}
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value='code' className='mt-4'>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{t('Custom CSS')}</CardTitle>
+                    <CardDescription>
+                      {t('Write custom CSS for the banner background. CSS is scoped to .top-banner.')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className='flex flex-col gap-4'>
+                    <div className='flex flex-wrap gap-2'>
+                      <Button
+                        type='button'
+                        variant='outline'
+                        size='sm'
+                        onClick={() => form.setValue('BannerCustomCSS', flowTemplate, { shouldDirty: true })}
+                      >
+                        {t('Flowing Gradient')}
+                      </Button>
+                      <Button
+                        type='button'
+                        variant='outline'
+                        size='sm'
+                        onClick={() => form.setValue('BannerCustomCSS', pulseTemplate, { shouldDirty: true })}
+                      >
+                        {t('Pulse')}
+                      </Button>
+                      <Button
+                        type='button'
+                        variant='outline'
+                        size='sm'
+                        onClick={() => form.setValue('BannerCustomCSS', shimmerTemplate, { shouldDirty: true })}
+                      >
+                        {t('Shimmer')}
+                      </Button>
+                      <Button
+                        type='button'
+                        variant='outline'
+                        size='sm'
+                        onClick={() => form.setValue('BannerCustomCSS', rainbowTemplate, { shouldDirty: true })}
+                      >
+                        {t('Rainbow')}
+                      </Button>
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name='BannerCustomCSS'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Textarea
+                              className='font-mono text-sm'
+                              rows={10}
+                              placeholder={t('Enter custom CSS...')}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
 
             <FormField
               control={form.control}

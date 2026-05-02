@@ -31,7 +31,12 @@ export type GeneralSettings = {
   'theme.frontend': string
   Notice: string
   BannerContent: string
-  BannerBackgroundColor: string
+  BannerMode: string
+  BannerPreset: string
+  BannerColors: string
+  BannerSpeed: string
+  BannerVisualConfig: string
+  BannerCustomCSS: string
   BannerFontColor: string
   SystemName: string
   Logo: string

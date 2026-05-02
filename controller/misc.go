@@ -186,9 +186,14 @@ func GetBanner(c *gin.Context) {
 		"success": true,
 		"message": "",
 		"data": gin.H{
-			"content":          common.OptionMap["BannerContent"],
-			"background_color": common.OptionMap["BannerBackgroundColor"],
-			"font_color":       common.OptionMap["BannerFontColor"],
+			"content":        common.OptionMap["BannerContent"],
+			"mode":           common.OptionMap["BannerMode"],
+			"preset":         common.OptionMap["BannerPreset"],
+			"colors":         common.OptionMap["BannerColors"],
+			"speed":          common.OptionMap["BannerSpeed"],
+			"visual_config":  common.OptionMap["BannerVisualConfig"],
+			"custom_css":     common.OptionMap["BannerCustomCSS"],
+			"font_color":     common.OptionMap["BannerFontColor"],
 		},
 	})
 	return
