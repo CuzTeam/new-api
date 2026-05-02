@@ -102,6 +102,7 @@ const GENERAL_SECTIONS = [
           DefaultCollapseSidebar: settings.DefaultCollapseSidebar,
           DemoSiteEnabled: settings.DemoSiteEnabled,
           SelfUseModeEnabled: settings.SelfUseModeEnabled,
+          AutoAcceptUnpricedModel: settings.AutoAcceptUnpricedModel,
         }}
       />
     ),

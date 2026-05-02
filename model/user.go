@@ -393,7 +393,9 @@ func (user *User) Insert(inviterId int) error {
 	// 初始化用户设置，包括默认的边栏配置
 	if user.Setting == "" {
 		defaultSetting := dto.UserSetting{}
-		// 这里暂时不设置SidebarModules，因为需要在用户创建后根据角色设置
+		if common.AutoAcceptUnpricedModel {
+			defaultSetting.AcceptUnsetRatioModel = true
+		}
 		user.SetSetting(defaultSetting)
 	}
 
@@ -451,6 +453,9 @@ func (user *User) InsertWithTx(tx *gorm.DB, inviterId int) error {
 	// 初始化用户设置
 	if user.Setting == "" {
 		defaultSetting := dto.UserSetting{}
+		if common.AutoAcceptUnpricedModel {
+			defaultSetting.AcceptUnsetRatioModel = true
+		}
 		user.SetSetting(defaultSetting)
 	}
 
