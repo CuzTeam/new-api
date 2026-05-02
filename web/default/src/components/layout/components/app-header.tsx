@@ -1,5 +1,6 @@
 import { useNotifications } from '@/hooks/use-notifications'
 import { useTopNavLinks } from '@/hooks/use-top-nav-links'
+import { AvailabilityButton } from '@/components/availability-button'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { NotificationButton } from '@/components/notification-button'
@@ -102,6 +103,7 @@ export function AppHeader({
         {rightContent ?? (
           <div className='ms-auto flex items-center space-x-4'>
             {showSearch && <Search />}
+            <AvailabilityButton />
             {showNotifications && (
               <NotificationButton
                 unreadCount={notifications.unreadCount}

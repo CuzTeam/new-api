@@ -296,6 +296,7 @@ export function finalizeMessage(
  * Converts stuck loading/streaming messages to stable state
  */
 export function sanitizeMessagesOnLoad(messages: Message[]): Message[] {
+  if (!Array.isArray(messages)) return []
   let targetIndex = -1
   for (let i = messages.length - 1; i >= 0; i--) {
     const m = messages[i]

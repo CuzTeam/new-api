@@ -26,6 +26,7 @@ function getAvailabilityBadgeColor(availability: number): BadgeColor {
 
 export function AvailabilityTable({ data }: { data: ModelAvailability[] }) {
   const { t } = useTranslation()
+  const safeData = Array.isArray(data) ? data : []
 
   return (
     <div className='rounded-md border'>
@@ -38,14 +39,14 @@ export function AvailabilityTable({ data }: { data: ModelAvailability[] }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.length === 0 ? (
+          {safeData.length === 0 ? (
             <TableRow>
               <TableCell colSpan={3} className='h-24 text-center text-muted-foreground'>
                 {t('No data available')}
               </TableCell>
             </TableRow>
           ) : (
-            data.map((item) => {
+            safeData.map((item) => {
               const primaryChannel = item.channels[0]
               const hasMultipleChannels = item.channels.length > 1
 

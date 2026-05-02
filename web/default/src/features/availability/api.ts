@@ -13,5 +13,5 @@ export async function getAvailabilityStats(
     '/api/log/availability',
     { params }
   )
-  return res.data.data
+  return Array.isArray(res.data.data) ? res.data.data : []
 }

@@ -70,7 +70,11 @@ export function loadMessages(): Message[] | null {
   try {
     const saved = localStorage.getItem(STORAGE_KEYS.MESSAGES)
     if (saved) {
-      const parsed: Message[] = JSON.parse(saved)
+      const parsed = JSON.parse(saved)
+      if (!Array.isArray(parsed)) {
+        localStorage.removeItem(STORAGE_KEYS.MESSAGES)
+        return null
+      }
       const sanitized = sanitizeMessagesOnLoad(parsed)
       // Persist sanitized result to avoid re-sanitizing on subsequent loads
       if (sanitized !== parsed) {
