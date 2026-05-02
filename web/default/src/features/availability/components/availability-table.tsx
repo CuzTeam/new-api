@@ -29,13 +29,13 @@ export function AvailabilityTable({ data }: { data: ModelAvailability[] }) {
   const safeData = Array.isArray(data) ? data : []
 
   return (
-    <div className='rounded-md border'>
+    <div className='rounded-md border overflow-x-auto -mx-1 px-1'>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t('Channel Provider')}</TableHead>
-            <TableHead>{t('Model ID')}</TableHead>
-            <TableHead className='w-[300px]'>{t('Availability')}</TableHead>
+            <TableHead className='whitespace-nowrap'>{t('Channel Provider')}</TableHead>
+            <TableHead className='whitespace-nowrap'>{t('Model ID')}</TableHead>
+            <TableHead className='whitespace-nowrap min-w-[200px] sm:min-w-[300px]'>{t('Availability')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -52,7 +52,7 @@ export function AvailabilityTable({ data }: { data: ModelAvailability[] }) {
 
               return (
                 <TableRow key={item.model_name}>
-                  <TableCell>
+                  <TableCell className='whitespace-nowrap'>
                     {primaryChannel ? (
                       hasMultipleChannels ? (
                         <TooltipProvider delayDuration={100}>
@@ -84,16 +84,16 @@ export function AvailabilityTable({ data }: { data: ModelAvailability[] }) {
                       <span className='text-muted-foreground'>-</span>
                     )}
                   </TableCell>
-                  <TableCell className='font-mono text-sm'>
+                  <TableCell className='font-mono text-sm whitespace-nowrap'>
                     {item.model_name}
                   </TableCell>
                   <TableCell>
-                    <div className='flex items-center gap-3'>
+                    <div className='flex items-center gap-2 sm:gap-3'>
                       <Progress
                         value={item.availability}
-                        className='h-2 flex-1'
+                        className='h-2 flex-1 min-w-[80px]'
                       />
-                      <Badge color={getAvailabilityBadgeColor(item.availability)} className='w-16 justify-center tabular-nums'>
+                      <Badge color={getAvailabilityBadgeColor(item.availability)} className='w-14 sm:w-16 justify-center tabular-nums text-xs sm:text-sm'>
                         {item.availability.toFixed(1)}%
                       </Badge>
                     </div>

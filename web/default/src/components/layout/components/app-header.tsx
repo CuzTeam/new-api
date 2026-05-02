@@ -102,7 +102,7 @@ export function AppHeader({
         {leftSection}
         {rightContent ?? (
           <div className='ms-auto flex items-center space-x-4'>
-            {showSearch && <Search />}
+            {showSearch && <div className='hidden sm:block'><Search /></div>}
             <AvailabilityButton />
             {showNotifications && (
               <NotificationButton

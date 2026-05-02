@@ -42,7 +42,7 @@ export function AvailabilityButton({ className }: { className?: string }) {
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className='sm:max-w-3xl max-h-[80vh] overflow-auto'>
+        <DialogContent className='sm:max-w-3xl max-h-[80vh] overflow-auto w-[calc(100vw-2rem)]'>
           <DialogHeader>
             <DialogTitle>{t('Availability Status Monitor')}</DialogTitle>
             <DialogDescription>
