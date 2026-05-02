@@ -99,8 +99,7 @@ func GetStatus(c *gin.Context) {
 		"uptime_kuma_enabled":   cs.UptimeKumaEnabled,
 		"announcements_enabled": cs.AnnouncementsEnabled,
 		"faq_enabled":           cs.FAQEnabled,
-		"availability_enabled":        cs.AvailabilityEnabled,
-		"availability_hidden_channels": cs.AvailabilityHiddenChannels,
+		"availability_enabled": cs.AvailabilityEnabled,
 
 		// 模块管理配置
 		"HeaderNavModules":    common.OptionMap["HeaderNavModules"],

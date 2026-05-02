@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/model"
@@ -182,6 +183,16 @@ func GetAvailability(c *gin.Context) {
 
 	startTimestamp, _ := strconv.ParseInt(c.Query("start_timestamp"), 10, 64)
 	endTimestamp, _ := strconv.ParseInt(c.Query("end_timestamp"), 10, 64)
+
+	if endTimestamp == 0 {
+		endTimestamp = time.Now().Unix()
+	}
+	if startTimestamp == 0 {
+		startTimestamp = endTimestamp - 86400
+	}
+	if endTimestamp-startTimestamp > 7*86400 {
+		startTimestamp = endTimestamp - 7*86400
+	}
 
 	hiddenChannels := console_setting.GetAvailabilityHiddenChannels()
 
