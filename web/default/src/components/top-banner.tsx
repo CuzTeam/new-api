@@ -44,8 +44,8 @@ export function TopBanner() {
       setShouldScroll(false)
       return
     }
-    const containerWidth = containerRef.current.offsetWidth
-    const textWidth = textRef.current.scrollWidth
+    const containerWidth = containerRef.current.clientWidth
+    const textWidth = textRef.current.offsetWidth
     setShouldScroll(textWidth > containerWidth)
   }, [content])
 
@@ -88,7 +88,7 @@ export function TopBanner() {
             <span className='mr-8'>{content}</span>
           </div>
         ) : (
-          <div className='text-center'>
+          <div className='whitespace-nowrap text-center'>
             <span ref={textRef}>{content}</span>
           </div>
         )}
