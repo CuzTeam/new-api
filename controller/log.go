@@ -6,6 +6,7 @@ import (
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/model"
+	"github.com/QuantumNous/new-api/setting/console_setting"
 
 	"github.com/gin-gonic/gin"
 )
@@ -168,4 +169,31 @@ func DeleteHistoryLogs(c *gin.Context) {
 		"data":    count,
 	})
 	return
+}
+
+func GetAvailability(c *gin.Context) {
+	if !console_setting.GetConsoleSetting().AvailabilityEnabled {
+		c.JSON(http.StatusForbidden, gin.H{
+			"success": false,
+			"message": "可用性面板未启用",
+		})
+		return
+	}
+
+	startTimestamp, _ := strconv.ParseInt(c.Query("start_timestamp"), 10, 64)
+	endTimestamp, _ := strconv.ParseInt(c.Query("end_timestamp"), 10, 64)
+
+	hiddenChannels := console_setting.GetAvailabilityHiddenChannels()
+
+	stats, err := model.GetAvailabilityStats(hiddenChannels, startTimestamp, endTimestamp)
+	if err != nil {
+		common.ApiError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data":    stats,
+	})
 }

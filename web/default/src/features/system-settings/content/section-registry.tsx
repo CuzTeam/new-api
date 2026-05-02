@@ -2,6 +2,7 @@ import type { ContentSettings } from '../types'
 import { createSectionRegistry } from '../utils/section-registry'
 import { AnnouncementsSection } from './announcements-section'
 import { ApiInfoSection } from './api-info-section'
+import { AvailabilitySection } from './availability-section'
 import { ChatSettingsSection } from './chat-settings-section'
 import { DashboardSection } from './dashboard-section'
 import { DrawingSettingsSection } from './drawing-settings-section'
@@ -77,6 +78,17 @@ const CONTENT_SECTIONS = [
       <UptimeKumaSection
         enabled={settings['console_setting.uptime_kuma_enabled']}
         data={settings['console_setting.uptime_kuma_groups']}
+      />
+    ),
+  },
+  {
+    id: 'availability',
+    titleKey: 'Availability Panel',
+    descriptionKey: 'Configure availability monitoring panel',
+    build: (settings: ContentSettings) => (
+      <AvailabilitySection
+        enabled={settings['console_setting.availability_enabled']}
+        data={settings['console_setting.availability_hidden_channels']}
       />
     ),
   },

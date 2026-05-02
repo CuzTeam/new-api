@@ -17,6 +17,8 @@ const defaultContentSettings: ContentSettings = {
   'console_setting.announcements_enabled': true,
   'console_setting.faq_enabled': true,
   'console_setting.uptime_kuma_enabled': false,
+  'console_setting.availability_enabled': false,
+  'console_setting.availability_hidden_channels': '[]',
   DataExportEnabled: false,
   DataExportDefaultTime: 'hour',
   DataExportInterval: 5,
@@ -98,6 +100,7 @@ export function ContentSettings() {
     | 'api-info'
     | 'faq'
     | 'uptime-kuma'
+    | 'availability'
     | 'chat'
     | 'drawing'
   const sectionContent = getContentSectionContent(activeSection, settings)

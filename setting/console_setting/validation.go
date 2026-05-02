@@ -73,6 +73,8 @@ func ValidateConsoleSettings(settingsStr string, settingType string) error {
 		return validateFAQ(settingsStr)
 	case "UptimeKumaGroups":
 		return validateUptimeKumaGroups(settingsStr)
+	case "AvailabilityHiddenChannels":
+		return validateAvailabilityHiddenChannels(settingsStr)
 	default:
 		return fmt.Errorf("未知的设置类型：%s", settingType)
 	}
@@ -301,4 +303,21 @@ func validateUptimeKumaGroups(groupsStr string) error {
 
 func GetUptimeKumaGroups() []map[string]interface{} {
 	return getJSONList(GetConsoleSetting().UptimeKumaGroups)
+}
+
+func GetAvailabilityHiddenChannels() []int {
+	var channels []int
+	json.Unmarshal([]byte(GetConsoleSetting().AvailabilityHiddenChannels), &channels)
+	return channels
+}
+
+func validateAvailabilityHiddenChannels(channelsStr string) error {
+	var channels []int
+	if err := json.Unmarshal([]byte(channelsStr), &channels); err != nil {
+		return fmt.Errorf("隐藏渠道格式错误：%s", err.Error())
+	}
+	if len(channels) > 100 {
+		return fmt.Errorf("隐藏渠道数量不能超过100个")
+	}
+	return nil
 }

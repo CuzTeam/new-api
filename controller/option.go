@@ -314,6 +314,15 @@ func UpdateOption(c *gin.Context) {
 			})
 			return
 		}
+	case "console_setting.availability_hidden_channels":
+		err = console_setting.ValidateConsoleSettings(option.Value.(string), "AvailabilityHiddenChannels")
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": err.Error(),
+			})
+			return
+		}
 	}
 	err = model.UpdateOption(option.Key, option.Value.(string))
 	if err != nil {
