@@ -2230,7 +2230,7 @@
     "注 册": "S'inscrire",
     "注册": "S'inscrire",
     "注册 Passkey": "Enregistrer un Passkey",
-    "注册时自动启用"接受未定价模型"": "Accepter automatiquement les modèles non tarifés à l'inscription",
+    "注册时自动启用\"接受未定价模型\"": "Accepter automatiquement les modèles non tarifés à l'inscription",
     "注意": "Remarque",
     "注意：JSON中重复的键只会保留最后一个同名键的值": "Remarque : Dans JSON, pour les clés dupliquées, seule la valeur de la dernière clé du même nom sera conservée",
     "注意非Chat API，请务必填写正确的API地址，否则可能导致无法使用": "Remarque : Pour les API non-Chat, assurez-vous de saisir l'adresse API correcte, sinon elle pourrait ne pas fonctionner",
