@@ -2,7 +2,6 @@
   <h1>CuzAPI (NewAPI Fork Version)</h1>
 </div>
 
----
 
 ## Docker Image
 ```text
@@ -18,6 +17,4 @@ ghcr.io/cuzteam/new-api
 
 ### Image Build & Push
 
-<div align="center">
-  <img src="https://github.com/CuzTeam/new-api/actions/workflows/docker-image-ghcr.yml/badge.svg" alt="Build & Push GHCR">
-</div>
+<img src="https://actpic-gh.vercel.app/api/CuzTeam/new-api/all?theme=dark&limit=5"></img>
