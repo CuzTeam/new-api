@@ -206,6 +206,8 @@ export async function getBanner(): Promise<{
   message?: string
   data?: {
     content: string
+    type: string
+    dismissible: string
     mode: string
     preset: string
     colors: string

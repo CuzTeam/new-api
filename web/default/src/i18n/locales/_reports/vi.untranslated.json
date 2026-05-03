@@ -4,8 +4,8 @@
   "Choose a preset effect and customize colors and speed.": "Choose a preset effect and customize colors and speed.",
   "Comma-separated color values for the gradient.": "Comma-separated color values for the gradient.",
   "Configure the banner background style.": "Configure the banner background style.",
+  "e.g., #ffffff or white": "e.g., #ffffff or white",
   "Enter banner content to display at the top of the page": "Enter banner content to display at the top of the page",
   "Font color for the banner text. Supports any CSS color value. Leave empty for default.": "Font color for the banner text. Supports any CSS color value. Leave empty for default.",
-  "Write custom CSS for the banner background. CSS is scoped to .top-banner.": "Write custom CSS for the banner background. CSS is scoped to .top-banner.",
-  "e.g., #ffffff or white": "e.g., #ffffff or white"
+  "Write custom CSS for the banner background. CSS is scoped to .top-banner.": "Write custom CSS for the banner background. CSS is scoped to .top-banner."
 }

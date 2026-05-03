@@ -27,11 +27,16 @@ export function AuthenticatedLayout(props: AuthenticatedLayoutProps) {
               className={cn(
                 '@container/content',
                 'h-svh',
+                'overflow-hidden',
                 'peer-data-[variant=inset]:h-[calc(100svh-(var(--spacing)*4))]'
               )}
             >
-              <TopBanner />
-              {props.children ?? <AnimatedOutlet />}
+              <div className='authenticated-main-frame'>
+                <TopBanner />
+                <div className='authenticated-main-content'>
+                  {props.children ?? <AnimatedOutlet />}
+                </div>
+              </div>
             </SidebarInset>
           </SidebarProvider>
         </WorkspaceProvider>

@@ -206,6 +206,37 @@ func UpdateOption(c *gin.Context) {
 			})
 			return
 		}
+	case "BannerType":
+		switch option.Value {
+		case "notice", "maintenance", "important", "warning", "outage", "success":
+		default:
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": "invalid banner type",
+			})
+			return
+		}
+	case "BannerDismissible":
+		if option.Value != "true" && option.Value != "false" {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": "invalid banner dismissible value",
+			})
+			return
+		}
+	case "BannerPreset":
+		if option.Value != "" {
+			switch option.Value {
+			case "notice-glass", "maintenance-stripe", "important-alert", "warning-soft", "incident-critical", "success-soft",
+				"flow", "pulse", "shimmer", "rainbow", "aurora", "spotlight", "scanline", "solid", "gradient":
+			default:
+				c.JSON(http.StatusOK, gin.H{
+					"success": false,
+					"message": "invalid banner preset",
+				})
+				return
+			}
+		}
 	case "GroupRatio":
 		err = ratio_setting.CheckGroupRatio(option.Value.(string))
 		if err != nil {
