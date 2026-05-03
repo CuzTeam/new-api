@@ -23,9 +23,12 @@
   }
   html {
     @apply overflow-x-hidden font-sans;
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
   }
   body {
     @apply bg-background text-foreground has-[div[data-variant='inset']]:bg-sidebar min-h-svh w-full font-sans;
+    scrollbar-gutter: stable;
   }
 
   /* Override Radix scroll locking for sticky headers */
@@ -435,6 +438,297 @@
   animation: marquee 20s linear infinite;
 }
 
+.authenticated-main-frame {
+  display: flex;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: inherit;
+  background: hsl(var(--background));
+}
+
+.authenticated-main-content {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.top-banner {
+  --banner-motion-duration: 8s;
+  min-height: 46px;
+  margin: 10px 12px 8px;
+  padding: 9px 12px;
+  gap: 10px;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  box-shadow: 0 14px 30px rgb(15 23 42 / 0.12);
+  contain: layout paint;
+  transform: translateZ(0);
+}
+
+.faded-bottom,
+.overflow-y-auto {
+  scrollbar-gutter: stable;
+}
+
+.top-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.top-banner-icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.92);
+  color: #172033;
+}
+
+.top-banner-copy {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.top-banner-message {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.top-banner-measure {
+  position: absolute;
+  inset: auto;
+  width: max-content;
+  height: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.top-banner-message-scroll {
+  max-width: none;
+  padding-right: 32px;
+}
+
+.top-banner-copy strong {
+  margin-right: 8px;
+  font-weight: 700;
+}
+
+.top-banner-separator {
+  margin-right: 8px;
+  opacity: 0.5;
+}
+
+.top-banner button {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.14);
+  color: inherit;
+  transition:
+    background-color 150ms ease,
+    opacity 150ms ease;
+}
+
+.top-banner button:hover {
+  background: rgb(255 255 255 / 0.24);
+}
+
+.banner-speed-slow {
+  --banner-motion-duration: 14s;
+}
+
+.banner-speed-medium {
+  --banner-motion-duration: 8s;
+}
+
+.banner-speed-fast {
+  --banner-motion-duration: 4s;
+}
+
+.top-banner-notice,
+.banner-preset-notice-glass {
+  color: #f8fafc;
+  background:
+    linear-gradient(135deg, rgb(15 23 42 / 0.88), rgb(30 64 175 / 0.78)),
+    #0f172a;
+  border-color: rgb(255 255 255 / 0.22);
+}
+
+.top-banner-notice::before,
+.banner-preset-notice-glass::before {
+  background: linear-gradient(120deg, transparent, rgb(255 255 255 / 0.12), transparent);
+  transform: translateX(-42%);
+}
+
+.banner-preset-notice-glass {
+  color: #0f172a;
+  background:
+    linear-gradient(135deg, rgb(239 246 255 / 0.94), rgb(224 242 254 / 0.88)),
+    #eff6ff;
+  border-color: rgb(125 211 252 / 0.46);
+  box-shadow: 0 12px 28px rgb(14 165 233 / 0.14);
+}
+
+.banner-preset-notice-glass::before {
+  background: linear-gradient(120deg, transparent, rgb(14 165 233 / 0.14), transparent);
+}
+
+.banner-preset-notice-glass .top-banner-icon {
+  color: #1d4ed8;
+  background: rgb(255 255 255 / 0.9);
+}
+
+.banner-preset-notice-glass button {
+  background: rgb(37 99 235 / 0.08);
+}
+
+.banner-preset-notice-glass button:hover {
+  background: rgb(37 99 235 / 0.14);
+}
+
+.top-banner-maintenance,
+.banner-preset-maintenance-stripe {
+  color: #3d2d05;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgb(245 158 11 / 0.15) 0,
+      rgb(245 158 11 / 0.15) 8px,
+      rgb(255 255 255 / 0) 8px,
+      rgb(255 255 255 / 0) 16px
+    ),
+    #fff9eb;
+  border-color: rgb(245 158 11 / 0.24);
+  box-shadow: 0 10px 22px rgb(146 64 14 / 0.10);
+}
+
+.top-banner-maintenance .top-banner-icon,
+.banner-preset-maintenance-stripe .top-banner-icon {
+  color: #ffffff;
+  background: #b45309;
+}
+
+.top-banner-maintenance button,
+.banner-preset-maintenance-stripe button {
+  background: rgb(146 64 14 / 0.10);
+}
+
+.top-banner-important,
+.banner-preset-important-alert {
+  color: #fff7f7;
+  background:
+    linear-gradient(135deg, rgb(127 29 29 / 0.94), rgb(190 18 60 / 0.82)),
+    #7f1d1d;
+  border-color: rgb(254 202 202 / 0.28);
+}
+
+.top-banner-important .top-banner-icon,
+.banner-preset-important-alert .top-banner-icon {
+  color: #7f1d1d;
+}
+
+.top-banner-warning,
+.banner-preset-warning-soft {
+  color: #2f2105;
+  background: linear-gradient(135deg, #fff7d6, #ffedd5);
+  border-color: rgb(245 158 11 / 0.26);
+  box-shadow: 0 10px 24px rgb(180 83 9 / 0.12);
+}
+
+.top-banner-warning .top-banner-icon,
+.banner-preset-warning-soft .top-banner-icon {
+  color: #ffffff;
+  background: #d97706;
+}
+
+.top-banner-warning button,
+.banner-preset-warning-soft button {
+  background: rgb(146 64 14 / 0.10);
+}
+
+.top-banner-outage,
+.banner-preset-incident-critical {
+  color: #fff7f7;
+  background:
+    linear-gradient(135deg, rgb(69 10 10 / 0.96), rgb(185 28 28 / 0.88)),
+    #450a0a;
+  border-color: rgb(254 202 202 / 0.25);
+}
+
+.top-banner-outage .top-banner-icon,
+.banner-preset-incident-critical .top-banner-icon {
+  color: #991b1b;
+}
+
+.top-banner-success,
+.banner-preset-success-soft {
+  color: #062f24;
+  background: linear-gradient(135deg, #ecfdf5, #dff7ed);
+  border-color: rgb(16 185 129 / 0.24);
+  box-shadow: 0 10px 24px rgb(6 95 70 / 0.10);
+}
+
+.top-banner-success .top-banner-icon,
+.banner-preset-success-soft .top-banner-icon {
+  color: #ffffff;
+  background: #047857;
+}
+
+.top-banner-success button,
+.banner-preset-success-soft button {
+  background: rgb(6 95 70 / 0.10);
+}
+
+.banner-preset-notice-glass::before {
+  animation: banner-sweep var(--banner-motion-duration) ease-in-out infinite;
+}
+
+.banner-preset-maintenance-stripe {
+  background-size: 48px 48px, 100% 100%;
+  animation: banner-stripe-drift calc(var(--banner-motion-duration) * 1.4) linear infinite;
+}
+
+.banner-preset-important-alert {
+  animation: banner-important-glow var(--banner-motion-duration) ease-in-out infinite;
+}
+
+.banner-preset-warning-soft::before {
+  background: radial-gradient(circle at 12% 50%, rgb(245 158 11 / 0.18), transparent 34%);
+  animation: banner-soft-breathe var(--banner-motion-duration) ease-in-out infinite;
+}
+
+.banner-preset-incident-critical {
+  animation: banner-critical-pulse var(--banner-motion-duration) ease-in-out infinite;
+}
+
+.banner-preset-success-soft::before {
+  background: linear-gradient(120deg, transparent, rgb(16 185 129 / 0.18), transparent);
+  animation: banner-sweep calc(var(--banner-motion-duration) * 1.2) ease-in-out infinite;
+}
+
 @keyframes banner-flow {
   0% {
     background-position: 0% 50%;
@@ -474,9 +768,82 @@
   }
 }
 
+@keyframes banner-sweep {
+  0% {
+    transform: translateX(-82%);
+  }
+  55%, 100% {
+    transform: translateX(82%);
+  }
+}
+
+@keyframes banner-stripe-drift {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 48px 0, 0 0;
+  }
+}
+
+@keyframes banner-important-glow {
+  0%, 100% {
+    box-shadow: 0 12px 28px rgb(127 29 29 / 0.16);
+  }
+  50% {
+    box-shadow: 0 14px 34px rgb(190 18 60 / 0.26);
+  }
+}
+
+@keyframes banner-soft-breathe {
+  0%, 100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes banner-critical-pulse {
+  0%, 100% {
+    box-shadow: 0 12px 28px rgb(69 10 10 / 0.18);
+  }
+  50% {
+    box-shadow: 0 14px 36px rgb(185 28 28 / 0.32);
+  }
+}
+
+@keyframes banner-aurora {
+  0%, 100% {
+    background-position: 0% 50%, 100% 50%, 50% 100%;
+  }
+  50% {
+    background-position: 100% 50%, 0% 50%, 50% 0%;
+  }
+}
+
+@keyframes banner-spotlight {
+  0% {
+    background-position: -35% 50%, 0 0;
+  }
+  100% {
+    background-position: 135% 50%, 0 0;
+  }
+}
+
+@keyframes banner-scanline {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 0 36px, 0 0;
+  }
+}
+
 .banner-preset-flow {
+  background: linear-gradient(270deg, var(--banner-color-1, #0f172a), var(--banner-color-2, #2563eb), var(--banner-color-3, #0891b2), var(--banner-color-4, #0f766e));
   background-size: 400% 400%;
-  animation: banner-flow 8s ease infinite;
+  animation: banner-flow var(--banner-motion-duration) ease infinite;
 }
 
 .banner-preset-flow.banner-speed-slow {
@@ -488,7 +855,8 @@
 }
 
 .banner-preset-pulse {
-  animation: banner-pulse 2s ease-in-out infinite;
+  background: linear-gradient(135deg, var(--banner-color-1, #0f172a), var(--banner-color-2, #2563eb));
+  animation: banner-pulse calc(var(--banner-motion-duration) / 4) ease-in-out infinite;
 }
 
 .banner-preset-pulse.banner-speed-slow {
@@ -502,6 +870,7 @@
 .banner-preset-shimmer {
   position: relative;
   overflow: hidden;
+  background: linear-gradient(135deg, var(--banner-color-1, #0f172a), var(--banner-color-2, #2563eb));
 }
 
 .banner-preset-shimmer::after {
@@ -524,6 +893,7 @@
 }
 
 .banner-preset-rainbow {
+  background: linear-gradient(90deg, var(--banner-color-1, #ef4444), var(--banner-color-2, #f59e0b), var(--banner-color-3, #22c55e), var(--banner-color-4, #3b82f6));
   animation: banner-rainbow 8s linear infinite;
 }
 
@@ -535,10 +905,67 @@
   animation-duration: 4s;
 }
 
+.banner-preset-aurora {
+  background:
+    radial-gradient(circle at 20% 50%, color-mix(in srgb, var(--banner-color-1, #22d3ee) 82%, transparent), transparent 34%),
+    radial-gradient(circle at 80% 50%, color-mix(in srgb, var(--banner-color-2, #a855f7) 76%, transparent), transparent 36%),
+    linear-gradient(135deg, var(--banner-color-3, #0f172a), var(--banner-color-4, #2563eb));
+  background-size: 180% 180%, 180% 180%, 100% 100%;
+  animation: banner-aurora calc(var(--banner-motion-duration) * 1.35) ease-in-out infinite;
+}
+
+.banner-preset-aurora.banner-speed-slow {
+  animation-duration: 18s;
+}
+
+.banner-preset-aurora.banner-speed-fast {
+  animation-duration: 5s;
+}
+
+.banner-preset-spotlight {
+  background:
+    radial-gradient(circle at center, rgb(255 255 255 / 0.28), transparent 24%),
+    linear-gradient(135deg, var(--banner-color-1, #111827), var(--banner-color-2, #2563eb));
+  background-size: 42% 180%, 100% 100%;
+  background-repeat: no-repeat;
+  animation: banner-spotlight var(--banner-motion-duration) ease-in-out infinite;
+}
+
+.banner-preset-spotlight.banner-speed-slow {
+  animation-duration: 14s;
+}
+
+.banner-preset-spotlight.banner-speed-fast {
+  animation-duration: 4s;
+}
+
+.banner-preset-scanline {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgb(255 255 255 / 0.13) 0,
+      rgb(255 255 255 / 0.13) 1px,
+      transparent 1px,
+      transparent 9px
+    ),
+    linear-gradient(135deg, var(--banner-color-1, #020617), var(--banner-color-2, #0f766e));
+  animation: banner-scanline calc(var(--banner-motion-duration) / 1.5) linear infinite;
+}
+
+.banner-preset-scanline.banner-speed-slow {
+  animation-duration: 12s;
+}
+
+.banner-preset-scanline.banner-speed-fast {
+  animation-duration: 3s;
+}
+
 .banner-preset-solid {
+  background: var(--banner-color-1, #2563eb);
 }
 
 .banner-preset-gradient {
+  background: linear-gradient(to right, var(--banner-color-1, #0f172a), var(--banner-color-2, #2563eb));
 }
 
 @media (prefers-reduced-motion: reduce) {

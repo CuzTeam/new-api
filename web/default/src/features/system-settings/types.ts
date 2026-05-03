@@ -31,6 +31,8 @@ export type GeneralSettings = {
   'theme.frontend': string
   Notice: string
   BannerContent: string
+  BannerType: string
+  BannerDismissible: string
   BannerMode: string
   BannerPreset: string
   BannerColors: string

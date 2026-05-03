@@ -20,6 +20,19 @@ const STATUS_RELATED_KEYS = [
   'general_setting.custom_currency_exchange_rate',
 ]
 
+const BANNER_RELATED_KEYS = [
+  'BannerContent',
+  'BannerType',
+  'BannerDismissible',
+  'BannerMode',
+  'BannerPreset',
+  'BannerColors',
+  'BannerSpeed',
+  'BannerVisualConfig',
+  'BannerCustomCSS',
+  'BannerFontColor',
+]
+
 export function useUpdateOption() {
   const queryClient = useQueryClient()
 
@@ -33,6 +46,10 @@ export function useUpdateOption() {
         // If updating frontend-display-related config, also refresh status
         if (STATUS_RELATED_KEYS.includes(variables.key)) {
           queryClient.invalidateQueries({ queryKey: ['status'] })
+        }
+
+        if (BANNER_RELATED_KEYS.includes(variables.key)) {
+          queryClient.invalidateQueries({ queryKey: ['banner'] })
         }
 
         toast.success(i18next.t('Setting updated successfully'))

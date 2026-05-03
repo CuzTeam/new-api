@@ -12,6 +12,8 @@ const defaultGeneralSettings: GeneralSettings = {
   'theme.frontend': 'default',
   Notice: '',
   BannerContent: '',
+  BannerType: 'notice',
+  BannerDismissible: 'true',
   BannerMode: '',
   BannerPreset: '',
   BannerColors: '',

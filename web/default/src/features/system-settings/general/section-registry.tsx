@@ -20,6 +20,8 @@ const GENERAL_SECTIONS = [
           },
           Notice: settings.Notice,
           BannerContent: settings.BannerContent,
+          BannerType: settings.BannerType,
+          BannerDismissible: settings.BannerDismissible,
           BannerMode: settings.BannerMode,
           BannerPreset: settings.BannerPreset,
           BannerColors: settings.BannerColors,
