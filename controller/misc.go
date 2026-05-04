@@ -61,6 +61,7 @@ func GetStatus(c *gin.Context) {
 		"linuxdo_minimum_trust_level": common.LinuxDOMinimumTrustLevel,
 		"telegram_oauth":              common.TelegramOAuthEnabled,
 		"telegram_bot_name":           common.TelegramBotName,
+		"theme":                       system_setting.GetThemeSettings().Frontend,
 		"system_name":                 common.SystemName,
 		"logo":                        common.Logo,
 		"footer_html":                 common.Footer,
@@ -98,6 +99,7 @@ func GetStatus(c *gin.Context) {
 		"uptime_kuma_enabled":   cs.UptimeKumaEnabled,
 		"announcements_enabled": cs.AnnouncementsEnabled,
 		"faq_enabled":           cs.FAQEnabled,
+		"availability_enabled": cs.AvailabilityEnabled,
 
 		// 模块管理配置
 		"HeaderNavModules":    common.OptionMap["HeaderNavModules"],
@@ -173,6 +175,28 @@ func GetNotice(c *gin.Context) {
 		"success": true,
 		"message": "",
 		"data":    common.OptionMap["Notice"],
+	})
+	return
+}
+
+func GetBanner(c *gin.Context) {
+	common.OptionMapRWMutex.RLock()
+	defer common.OptionMapRWMutex.RUnlock()
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"data": gin.H{
+			"content":        common.OptionMap["BannerContent"],
+			"type":           common.OptionMap["BannerType"],
+			"dismissible":    common.OptionMap["BannerDismissible"],
+			"mode":           common.OptionMap["BannerMode"],
+			"preset":         common.OptionMap["BannerPreset"],
+			"colors":         common.OptionMap["BannerColors"],
+			"speed":          common.OptionMap["BannerSpeed"],
+			"visual_config":  common.OptionMap["BannerVisualConfig"],
+			"custom_css":     common.OptionMap["BannerCustomCSS"],
+			"font_color":     common.OptionMap["BannerFontColor"],
+		},
 	})
 	return
 }

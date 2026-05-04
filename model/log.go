@@ -531,3 +531,92 @@ func DeleteOldLog(ctx context.Context, targetTimestamp int64, limit int) (int64,
 
 	return total, nil
 }
+
+type ChannelAvailability struct {
+	ChannelId   int    `json:"channel_id"`
+	ChannelName string `json:"channel_name"`
+	Total       int64  `json:"total"`
+	Success     int64  `json:"success"`
+}
+
+type ModelAvailability struct {
+	ModelName       string                `json:"model_name"`
+	Channels        []ChannelAvailability `json:"channels"`
+	TotalRequests   int64                 `json:"total_requests"`
+	SuccessRequests int64                 `json:"success_requests"`
+	Availability    float64               `json:"availability"`
+}
+
+func GetAvailabilityStats(hiddenChannels []int, startTimestamp, endTimestamp int64) ([]ModelAvailability, error) {
+	if endTimestamp == 0 {
+		endTimestamp = time.Now().Unix()
+	}
+	if startTimestamp == 0 {
+		startTimestamp = endTimestamp - 86400
+	}
+
+	type rawStat struct {
+		ModelName   string `gorm:"column:model_name"`
+		ChannelId   int    `gorm:"column:channel_id"`
+		ChannelName string `gorm:"column:channel_name"`
+		Total       int64  `gorm:"column:total"`
+		Success     int64  `gorm:"column:success"`
+	}
+
+	var rawStats []rawStat
+
+	query := DB.Table("logs").
+		Select("logs.model_name, logs.channel_id, channels.name as channel_name, COUNT(*) as total, SUM(CASE WHEN logs.type = 2 THEN 1 ELSE 0 END) as success").
+		Joins("LEFT JOIN channels ON logs.channel_id = channels.id").
+		Where("logs.type IN ? AND logs.created_at >= ? AND logs.created_at <= ?", []int{LogTypeConsume, LogTypeError}, startTimestamp, endTimestamp)
+
+	if len(hiddenChannels) > 0 {
+		query = query.Where("logs.channel_id NOT IN ?", hiddenChannels)
+	}
+
+	query = query.Group("logs.model_name, logs.channel_id, channels.name")
+
+	if err := query.Scan(&rawStats).Error; err != nil {
+		return nil, err
+	}
+
+	modelMap := make(map[string]*ModelAvailability)
+	modelOrder := []string{}
+
+	for _, stat := range rawStats {
+		if stat.ModelName == "" {
+			continue
+		}
+		ma, exists := modelMap[stat.ModelName]
+		if !exists {
+			ma = &ModelAvailability{
+				ModelName: stat.ModelName,
+				Channels:  []ChannelAvailability{},
+			}
+			modelMap[stat.ModelName] = ma
+			modelOrder = append(modelOrder, stat.ModelName)
+		}
+		ma.Channels = append(ma.Channels, ChannelAvailability{
+			ChannelId:   stat.ChannelId,
+			ChannelName: stat.ChannelName,
+			Total:       stat.Total,
+			Success:     stat.Success,
+		})
+		ma.TotalRequests += stat.Total
+		ma.SuccessRequests += stat.Success
+	}
+
+	result := make([]ModelAvailability, 0, len(modelOrder))
+	for _, name := range modelOrder {
+		ma := modelMap[name]
+		if ma.TotalRequests > 0 {
+			ma.Availability = float64(ma.SuccessRequests) / float64(ma.TotalRequests) * 100
+			ma.Availability = float64(int(ma.Availability*100)) / 100
+		} else {
+			ma.Availability = 100
+		}
+		result = append(result, *ma)
+	}
+
+	return result, nil
+}

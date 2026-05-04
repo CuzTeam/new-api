@@ -1,0 +1,12 @@
+- [x] 颜色派生算法能正确从 hue 值生成亮色和暗色两套 CSS 变量
+- [x] ThemeColorProvider 能正确读取 Cookie 并在页面加载时应用主题色
+- [x] ThemeColorProvider 监听主题模式切换，自动更新衍生色板
+- [x] 预设色板展示 6-8 个预设色块，选中色块有高亮标识
+- [x] 自定义取色器能选取任意颜色并立即应用
+- [x] "重置默认"按钮能清除自定义主题色并恢复默认值
+- [x] Cookie 持久化正常工作，刷新页面后主题色恢复
+- [x] ConfigDrawer 中主题色配置区域位于 ThemeConfig 之后
+- [x] main.tsx 中 ThemeColorProvider 正确挂载在 ThemeProvider 内部
+- [x] 所有用户可见文本均有 i18n 翻译（en、zh、fr、ru、ja、vi）
+- [x] 自定义主题色在亮色和暗色模式下均有良好对比度和可读性
+- [x] 无 Cookie 时使用 theme.css 默认颜色，无闪烁

@@ -198,6 +198,45 @@ func UpdateOption(c *gin.Context) {
 			})
 			return
 		}
+	case "theme.frontend":
+		if option.Value != "default" && option.Value != "classic" {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": "无效的主题值，可选值：default（新版前端）、classic（经典前端）",
+			})
+			return
+		}
+	case "BannerType":
+		switch option.Value {
+		case "notice", "maintenance", "important", "warning", "outage", "success":
+		default:
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": "invalid banner type",
+			})
+			return
+		}
+	case "BannerDismissible":
+		if option.Value != "true" && option.Value != "false" {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": "invalid banner dismissible value",
+			})
+			return
+		}
+	case "BannerPreset":
+		if option.Value != "" {
+			switch option.Value {
+			case "notice-glass", "maintenance-stripe", "important-alert", "warning-soft", "incident-critical", "success-soft",
+				"flow", "pulse", "shimmer", "rainbow", "aurora", "spotlight", "scanline", "solid", "gradient":
+			default:
+				c.JSON(http.StatusOK, gin.H{
+					"success": false,
+					"message": "invalid banner preset",
+				})
+				return
+			}
+		}
 	case "GroupRatio":
 		err = ratio_setting.CheckGroupRatio(option.Value.(string))
 		if err != nil {
@@ -299,6 +338,15 @@ func UpdateOption(c *gin.Context) {
 		}
 	case "console_setting.uptime_kuma_groups":
 		err = console_setting.ValidateConsoleSettings(option.Value.(string), "UptimeKumaGroups")
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": err.Error(),
+			})
+			return
+		}
+	case "console_setting.availability_hidden_channels":
+		err = console_setting.ValidateConsoleSettings(option.Value.(string), "AvailabilityHiddenChannels")
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
