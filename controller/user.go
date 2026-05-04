@@ -92,6 +92,9 @@ func Login(c *gin.Context) {
 // setup session & cookies and then return user info
 func setupLogin(user *model.User, c *gin.Context) {
 	model.UpdateUserLastLoginAt(user.Id)
+	if theme := common.NormalizeFrontendTheme(user.GetSetting().FrontendTheme); theme != "" {
+		common.SetFrontendThemeCookie(c, theme)
+	}
 	session := sessions.Default(c)
 	session.Set("id", user.Id)
 	session.Set("username", user.Username)
@@ -387,6 +390,9 @@ func GetSelf(c *gin.Context) {
 
 	// 获取用户设置并提取sidebar_modules
 	userSetting := user.GetSetting()
+	if theme := common.NormalizeFrontendTheme(userSetting.FrontendTheme); theme != "" {
+		common.SetFrontendThemeCookie(c, theme)
+	}
 
 	// 构建响应数据，包含用户信息和权限
 	responseData := map[string]interface{}{
@@ -625,8 +631,7 @@ func AdminClearUserBinding(c *gin.Context) {
 
 func UpdateSelf(c *gin.Context) {
 	var requestData map[string]interface{}
-	err := json.NewDecoder(c.Request.Body).Decode(&requestData)
-	if err != nil {
+	if err := common.DecodeJson(c.Request.Body, &requestData); err != nil {
 		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
 		return
 	}
@@ -654,6 +659,38 @@ func UpdateSelf(c *gin.Context) {
 			common.ApiErrorI18n(c, i18n.MsgUpdateFailed)
 			return
 		}
+		common.ApiSuccessI18n(c, i18n.MsgUpdateSuccess, nil)
+		return
+	}
+
+	// 检查是否是 UI 风格更新请求
+	if frontendTheme, themeExists := requestData["frontend_theme"]; themeExists {
+		userId := c.GetInt("id")
+		user, err := model.GetUserById(userId, false)
+		if err != nil {
+			common.ApiError(c, err)
+			return
+		}
+
+		currentSetting := user.GetSetting()
+		themeStr, ok := frontendTheme.(string)
+		if !ok {
+			common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+			return
+		}
+		themeStr = strings.ToLower(strings.TrimSpace(themeStr))
+		if themeStr != "default" && themeStr != "classic" {
+			common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+			return
+		}
+		currentSetting.FrontendTheme = themeStr
+
+		user.SetSetting(currentSetting)
+		if err := user.Update(false); err != nil {
+			common.ApiErrorI18n(c, i18n.MsgUpdateFailed)
+			return
+		}
+		common.SetFrontendThemeCookie(c, themeStr)
 
 		common.ApiSuccessI18n(c, i18n.MsgUpdateSuccess, nil)
 		return
@@ -689,12 +726,12 @@ func UpdateSelf(c *gin.Context) {
 
 	// 原有的用户信息更新逻辑
 	var user model.User
-	requestDataBytes, err := json.Marshal(requestData)
+	requestDataBytes, err := common.Marshal(requestData)
 	if err != nil {
 		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
 		return
 	}
-	err = json.Unmarshal(requestDataBytes, &user)
+	err = common.Unmarshal(requestDataBytes, &user)
 	if err != nil {
 		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
 		return

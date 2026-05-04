@@ -6,6 +6,7 @@ import {
   CardStaggerItem,
 } from '@/components/page-transition'
 import { CheckinCalendarCard } from './components/checkin-calendar-card'
+import { FrontendThemeCard } from './components/frontend-theme-card'
 import { LanguagePreferencesCard } from './components/language-preferences-card'
 import { PasskeyCard } from './components/passkey-card'
 import { ProfileHeader } from './components/profile-header'
@@ -45,6 +46,7 @@ export function Profile() {
                     loading={loading}
                     onProfileUpdate={refreshProfile}
                   />
+                  <FrontendThemeCard />
                   <LanguagePreferencesCard
                     profile={profile}
                     onProfileUpdate={refreshProfile}

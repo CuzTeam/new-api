@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth-store'
 import { getSelf } from '@/lib/api'
+import { normalizeFrontendTheme, setFrontendTheme } from '@/lib/frontend-theme'
 import { AuthenticatedLayout } from '@/components/layout'
 
 // 内存中的验证标记，避免同一会话中重复验证
@@ -24,6 +25,17 @@ export const Route = createFileRoute('/_authenticated')({
       if (res?.success && res.data) {
         // 验证成功，更新用户信息（可能有变化）
         auth.setUser(res.data)
+        const setting = res.data?.setting
+        if (typeof setting === 'string') {
+          try {
+            const parsed = JSON.parse(setting) as { frontend_theme?: string }
+            if (parsed.frontend_theme) {
+              setFrontendTheme(normalizeFrontendTheme(parsed.frontend_theme))
+            }
+          } catch {
+            /* empty */
+          }
+        }
         sessionVerified = true
       } else {
         // 验证失败或 API 调用失败，清除本地缓存并跳转登录页
