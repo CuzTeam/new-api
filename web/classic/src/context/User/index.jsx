@@ -22,6 +22,18 @@ import { useTranslation } from 'react-i18next';
 import { reducer, initialState } from './reducer';
 import { normalizeLanguage } from '../../i18n/language';
 
+const FRONTEND_THEME_COOKIE_NAME = 'frontend_theme';
+const FRONTEND_THEME_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+
+const normalizeFrontendTheme = (value) => {
+  return value === 'classic' ? 'classic' : 'default';
+};
+
+const setFrontendTheme = (theme) => {
+  if (typeof document === 'undefined') return;
+  document.cookie = `${FRONTEND_THEME_COOKIE_NAME}=${theme}; path=/; max-age=${FRONTEND_THEME_COOKIE_MAX_AGE}`;
+};
+
 export const UserContext = React.createContext({
   state: initialState,
   dispatch: () => null,
@@ -42,6 +54,9 @@ export const UserProvider = ({ children }) => {
         }
         if (normalizedLanguage) {
           localStorage.setItem('i18nextLng', normalizedLanguage);
+        }
+        if (settings.frontend_theme) {
+          setFrontendTheme(normalizeFrontendTheme(settings.frontend_theme));
         }
       } catch (e) {
         // Ignore parse errors

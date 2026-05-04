@@ -1,5 +1,11 @@
 {
   "translation": {
+    "界面风格": "界面风格",
+    "新版本 UI": "新版本 UI",
+    "旧版本 UI": "旧版本 UI",
+    "可在新版本 UI 和旧版本 UI 之间切换，保存后页面会立即跳转": "可在新版本 UI 和旧版本 UI 之间切换，保存后页面会立即跳转",
+    "界面风格已切换，正在跳转": "界面风格已切换，正在跳转",
+    "界面风格切换失败": "界面风格切换失败",
     " + Web搜索 {{count}}次 / 1K 次 * {{symbol}}{{price}} * {{ratioType}} {{ratio}}_other": " + Web搜索 {{count}}次 / 1K 次 * {{symbol}}{{price}} * {{ratioType}} {{ratio}}",
     " + 图片生成调用 {{symbol}}{{price}} / 1次 * {{ratioType}} {{ratio}}": " + 图片生成调用 {{symbol}}{{price}} / 1次 * {{ratioType}} {{ratio}}",
     " + 文件搜索 {{count}}次 / 1K 次 * {{symbol}}{{price}} * {{ratioType}} {{ratio}}_other": " + 文件搜索 {{count}}次 / 1K 次 * {{symbol}}{{price}} * {{ratioType}} {{ratio}}",

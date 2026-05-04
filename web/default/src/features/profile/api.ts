@@ -42,6 +42,16 @@ export async function updateUserSettings(
 }
 
 /**
+ * Update frontend UI theme preference
+ */
+export async function updateFrontendTheme(
+  frontend_theme: 'default' | 'classic'
+): Promise<ApiResponse> {
+  const res = await api.put('/api/user/self', { frontend_theme })
+  return res.data
+}
+
+/**
  * Update interface language preference
  */
 export async function updateUserLanguage(language: string): Promise<ApiResponse> {

@@ -14,6 +14,7 @@ import { TitledCard } from '@/components/ui/titled-card'
 import { updateUserLanguage } from '../api'
 import { parseUserSettings } from '../lib'
 import type { UserProfile } from '../types'
+import { setFrontendTheme, normalizeFrontendTheme } from '@/lib/frontend-theme'
 
 const LANGUAGE_OPTIONS = [
   { value: 'zh', label: '简体中文' },
@@ -81,6 +82,13 @@ export function LanguagePreferencesCard(props: LanguagePreferencesCardProps) {
             language: nextLanguage,
           }),
         })
+      }
+
+      if (typeof document !== 'undefined') {
+        const setting = parseUserSettings(props.profile?.setting)
+        if (setting.frontend_theme) {
+          setFrontendTheme(normalizeFrontendTheme(setting.frontend_theme))
+        }
       }
 
       props.onProfileUpdate()
