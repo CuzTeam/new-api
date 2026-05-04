@@ -1,7 +1,11 @@
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
+import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
 import { cn } from '@/lib/utils'
+import { normalizeMathDelimiters } from '@/lib/markdown-math'
+import 'katex/dist/katex.min.css'
 
 interface MarkdownProps {
   children: string
@@ -9,6 +13,8 @@ interface MarkdownProps {
 }
 
 export function Markdown({ children, className }: MarkdownProps) {
+  const content = normalizeMathDelimiters(children)
+
   return (
     <div
       className={cn(
@@ -30,8 +36,8 @@ export function Markdown({ children, className }: MarkdownProps) {
       )}
     >
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw]}
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[rehypeRaw, rehypeKatex]}
         components={{
           // 自定义组件渲染（可选）
           a: ({ node, ...props }) => (
@@ -39,7 +45,7 @@ export function Markdown({ children, className }: MarkdownProps) {
           ),
         }}
       >
-        {children}
+        {content}
       </ReactMarkdown>
     </div>
   )
