@@ -63,24 +63,40 @@ func SetWebRouter(router *gin.Engine, assets ThemeAssets) {
 }
 
 func resolveFrontendTheme(c *gin.Context) string {
-	session := sessions.Default(c)
-	if sessionID := session.Get("id"); sessionID != nil {
-		if userID, ok := sessionID.(int); ok && userID > 0 {
-			user, err := model.GetUserById(userID, false)
-			if err == nil {
-				theme := common.NormalizeFrontendTheme(user.GetSetting().FrontendTheme)
-				if theme != "" {
-					common.SetFrontendThemeCookie(c, theme)
-					return theme
-				}
-			}
-		}
-	}
 	themeCookie, err := c.Cookie(common.FrontendThemeCookieName)
 	if err == nil {
 		theme := common.NormalizeFrontendTheme(themeCookie)
 		if theme != "" {
 			return theme
+		}
+	}
+
+	session := sessions.Default(c)
+	sessionTheme := common.NormalizeFrontendTheme(common.Interface2String(session.Get(common.FrontendThemeSessionKey)))
+	if sessionTheme != "" {
+		common.SetFrontendThemeCookie(c, sessionTheme)
+		return sessionTheme
+	}
+
+	if sessionID := session.Get("id"); sessionID != nil {
+		if userID, ok := sessionID.(int); ok && userID > 0 {
+			setting, err := model.GetUserSetting(userID, false)
+			if err == nil {
+				theme := common.NormalizeFrontendTheme(setting.FrontendTheme)
+				if theme != "" {
+					session.Set(common.FrontendThemeSessionKey, theme)
+					_ = session.Save()
+					common.SetFrontendThemeCookie(c, theme)
+					return theme
+				}
+			}
+
+			fallbackTheme := common.NormalizeFrontendTheme(common.GetTheme())
+			if fallbackTheme != "" {
+				session.Set(common.FrontendThemeSessionKey, fallbackTheme)
+				_ = session.Save()
+				return fallbackTheme
+			}
 		}
 	}
 	return common.GetTheme()

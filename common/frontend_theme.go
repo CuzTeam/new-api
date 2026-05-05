@@ -8,6 +8,7 @@ import (
 
 const FrontendThemeCookieName = "frontend_theme"
 const FrontendThemeCookieMaxAge = 60 * 60 * 24 * 365
+const FrontendThemeSessionKey = "frontend_theme"
 
 func NormalizeFrontendTheme(theme string) string {
 	theme = strings.ToLower(strings.TrimSpace(theme))

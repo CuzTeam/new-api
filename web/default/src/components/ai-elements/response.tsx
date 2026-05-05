@@ -3,6 +3,10 @@
 import { type ComponentProps, memo } from 'react'
 import { Streamdown } from 'streamdown'
 import { cn } from '@/lib/utils'
+import rehypeKatex from 'rehype-katex'
+import remarkMath from 'remark-math'
+import { normalizeMathDelimiters } from '@/lib/markdown-math'
+import 'katex/dist/katex.min.css'
 
 type ResponseProps = ComponentProps<typeof Streamdown>
 
@@ -23,6 +27,10 @@ export const Response = memo(
     }
 
     const safeChildren = stripCustomTags(children) as string
+    const normalizedChildren =
+      typeof safeChildren === 'string'
+        ? normalizeMathDelimiters(safeChildren)
+        : safeChildren
 
     return (
       <Streamdown
@@ -30,9 +38,11 @@ export const Response = memo(
           'size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0',
           className
         )}
+        remarkPlugins={[remarkMath]}
+        rehypePlugins={[rehypeKatex]}
         {...props}
       >
-        {safeChildren}
+        {normalizedChildren}
       </Streamdown>
     )
   },
