@@ -1,12 +1,28 @@
+/*
+Copyright (C) 2023-2026 QuantumNous
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+For commercial licensing, please contact support@quantumnous.com
+*/
 import { type ColumnDef } from '@tanstack/react-table'
 import { Eye, Info, Pencil, Settings2, Timer, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatTimestampToDate } from '@/lib/format'
 import { Button } from '@/components/ui/button'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
-import { stringToColor } from '@/lib/colors'
-import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
-import { Badge, type BadgeColor } from '@/components/ui/badge'
+import { StatusBadge } from '@/components/status-badge'
 import { getDeploymentStatusConfig } from '../constants'
 import {
   formatRemainingMinutes,
@@ -23,7 +39,6 @@ export function useDeploymentsColumns(opts: {
   onDelete: (deployment: Deployment) => void
 }): ColumnDef<Deployment>[] {
   const { t } = useTranslation()
-  const { copyToClipboard } = useCopyToClipboard()
   const STATUS = getDeploymentStatusConfig(t)
 
   return [
@@ -36,16 +51,13 @@ export function useDeploymentsColumns(opts: {
       cell: ({ row }) => {
         const id = row.original.id
         return (
-          <Badge
-            color='neutral'
-            className='font-mono cursor-pointer transition-opacity hover:opacity-70 active:scale-95'
-            onClick={(e) => {
-              e.stopPropagation()
-              copyToClipboard(String(id))
-            }}
-          >
-            {id}
-          </Badge>
+          <StatusBadge
+            label={String(id)}
+            variant='neutral'
+            copyText={String(id)}
+            size='sm'
+            className='font-mono'
+          />
         )
       },
       size: 120,
@@ -61,16 +73,13 @@ export function useDeploymentsColumns(opts: {
       cell: ({ getValue }) => {
         const name = String(getValue() || '-') || '-'
         return (
-          <Badge
-            color='neutral'
-            className='font-mono cursor-pointer transition-opacity hover:opacity-70 active:scale-95'
-            onClick={(e) => {
-              e.stopPropagation()
-              copyToClipboard(name)
-            }}
-          >
-            {name}
-          </Badge>
+          <StatusBadge
+            label={name}
+            variant='neutral'
+            copyText={name}
+            size='sm'
+            className='font-mono'
+          />
         )
       },
       minSize: 220,
@@ -88,7 +97,13 @@ export function useDeploymentsColumns(opts: {
           variant: 'neutral' as const,
         }
         return (
-          <Badge color={config.variant as BadgeColor}>{config.label}</Badge>
+          <StatusBadge
+            label={config.label}
+            variant={config.variant}
+            showDot={config.showDot}
+            size='sm'
+            copyable={false}
+          />
         )
       },
       filterFn: (row, id, value) => {
@@ -114,9 +129,12 @@ export function useDeploymentsColumns(opts: {
         if (!provider)
           return <span className='text-muted-foreground text-xs'>-</span>
         return (
-          <Badge color={stringToColor(String(provider)) as BadgeColor}>
-            {String(provider)}
-          </Badge>
+          <StatusBadge
+            label={String(provider)}
+            autoColor={String(provider)}
+            size='sm'
+            copyable={false}
+          />
         )
       },
       size: 140,
@@ -154,7 +172,12 @@ export function useDeploymentsColumns(opts: {
             <div className='flex flex-wrap items-center gap-2'>
               <span className='font-medium'>{remainingText}</span>
               {status === 'running' && percentRemain !== null ? (
-                <Badge color='info'>{percentRemain}%</Badge>
+                <StatusBadge
+                  label={`${percentRemain}%`}
+                  variant='info'
+                  size='sm'
+                  copyable={false}
+                />
               ) : null}
             </div>
             {remainingHuman ? (
@@ -188,16 +211,12 @@ export function useDeploymentsColumns(opts: {
           return <span className='text-muted-foreground text-xs'>-</span>
         return (
           <div className='flex flex-wrap items-center gap-2'>
-            <Badge
-              color='neutral'
-              className='cursor-pointer transition-opacity hover:opacity-70 active:scale-95'
-              onClick={(e) => {
-                e.stopPropagation()
-                copyToClipboard(String(hardware))
-              }}
-            >
-              {String(hardware)}
-            </Badge>
+            <StatusBadge
+              label={String(hardware)}
+              variant='neutral'
+              copyText={String(hardware)}
+              size='sm'
+            />
             {qty !== null ? (
               <span className='text-muted-foreground text-xs'>×{qty}</span>
             ) : null}

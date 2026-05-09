@@ -1,11 +1,5 @@
 {
-  "A text banner displayed at the top of all pages. Leave empty to disable.": "A text banner displayed at the top of all pages. Leave empty to disable.",
-  "Add animation effects to the banner background.": "Add animation effects to the banner background.",
-  "Choose a preset effect and customize colors and speed.": "Choose a preset effect and customize colors and speed.",
-  "Comma-separated color values for the gradient.": "Comma-separated color values for the gradient.",
-  "Configure the banner background style.": "Configure the banner background style.",
-  "e.g., #ffffff or white": "e.g., #ffffff or white",
-  "Enter banner content to display at the top of the page": "Enter banner content to display at the top of the page",
-  "Font color for the banner text. Supports any CSS color value. Leave empty for default.": "Font color for the banner text. Supports any CSS color value. Leave empty for default.",
-  "Write custom CSS for the banner background. CSS is scoped to .top-banner.": "Write custom CSS for the banner background. CSS is scoped to .top-banner."
+  "Base input and output token prices for this tier.": "Base input and output token prices for this tier.",
+  "Each tier supports up to 2 conditions. The last tier without conditions is the fallback.": "Each tier supports up to 2 conditions. The last tier without conditions is the fallback.",
+  "Set separate prices for cache reads and writes.": "Set separate prices for cache reads and writes."
 }
