@@ -204,6 +204,21 @@ func CacheGetChannel(id int) (*Channel, error) {
 	return c, nil
 }
 
+func CacheGetChannelByName(name string) (*Channel, error) {
+	if !common.MemoryCacheEnabled {
+		return GetChannelByName(name)
+	}
+	channelSyncLock.RLock()
+	defer channelSyncLock.RUnlock()
+
+	for _, channel := range channelsIDM {
+		if channel.Name == name && channel.Status == common.ChannelStatusEnabled {
+			return channel, nil
+		}
+	}
+	return nil, fmt.Errorf("channel with name %s not found", name)
+}
+
 func CacheGetChannelInfo(id int) (*ChannelInfo, error) {
 	if !common.MemoryCacheEnabled {
 		channel, err := GetChannelById(id, true)
