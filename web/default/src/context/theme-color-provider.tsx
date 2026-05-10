@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
-import { DEFAULT_HUE, generateThemeColors, applyThemeColors, removeThemeColors } from '@/lib/theme-color'
+import { generateThemeColors, applyThemeColors, removeThemeColors } from '@/lib/theme-color'
 import { useTheme } from '@/context/theme-provider'
 
 const THEME_COLOR_COOKIE_NAME = 'theme-color'

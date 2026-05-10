@@ -113,6 +113,8 @@ export type ContentSettings = {
   'console_setting.announcements_enabled': boolean
   'console_setting.faq_enabled': boolean
   'console_setting.uptime_kuma_enabled': boolean
+  'console_setting.availability_enabled': boolean
+  'console_setting.availability_hidden_channels': string
   DataExportEnabled: boolean
   DataExportDefaultTime: string
   DataExportInterval: number
@@ -262,6 +264,8 @@ export type OperationsSettings = {
   DefaultCollapseSidebar: boolean
   DemoSiteEnabled: boolean
   SelfUseModeEnabled: boolean
+  AutoAcceptUnpricedModel: boolean
+  'channel_selection_setting.enabled': boolean
   ChannelDisableThreshold: string
   QuotaRemindThreshold: string
   AutomaticDisableChannelEnabled: boolean
