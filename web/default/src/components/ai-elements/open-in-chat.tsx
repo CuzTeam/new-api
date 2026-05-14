@@ -1,21 +1,3 @@
-/*
-Copyright (C) 2023-2026 QuantumNous
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
-*/
 import { type ComponentProps, createContext, useContext } from 'react'
 import {
   ChevronDownIcon,
@@ -253,19 +235,14 @@ export type OpenInTriggerProps = ComponentProps<typeof DropdownMenuTrigger>
 export const OpenInTrigger = ({ children, ...props }: OpenInTriggerProps) => {
   const { t } = useTranslation()
   return (
-    <DropdownMenuTrigger
-      {...props}
-      render={
+    <DropdownMenuTrigger {...props} asChild>
+      {children ?? (
         <Button type='button' variant='outline'>
-          {children ?? (
-            <>
-              {t('Open in chat')}
-              <ChevronDownIcon className='ml-2 size-4' />
-            </>
-          )}
+          {t('Open in chat')}
+          <ChevronDownIcon className='ml-2 size-4' />
         </Button>
-      }
-    />
+      )}
+    </DropdownMenuTrigger>
   )
 }
 
@@ -274,20 +251,17 @@ export type OpenInChatGPTProps = ComponentProps<typeof DropdownMenuItem>
 export const OpenInChatGPT = (props: OpenInChatGPTProps) => {
   const { query } = useOpenInContext()
   return (
-    <DropdownMenuItem
-      {...props}
-      render={
-        <a
-          className='flex items-center gap-2'
-          href={providers.chatgpt.createUrl(query)}
-          rel='noopener'
-          target='_blank'
-        />
-      }
-    >
-      <span className='shrink-0'>{providers.chatgpt.icon}</span>
-      <span className='flex-1'>{providers.chatgpt.title}</span>
-      <ExternalLinkIcon className='size-4 shrink-0' />
+    <DropdownMenuItem asChild {...props}>
+      <a
+        className='flex items-center gap-2'
+        href={providers.chatgpt.createUrl(query)}
+        rel='noopener'
+        target='_blank'
+      >
+        <span className='shrink-0'>{providers.chatgpt.icon}</span>
+        <span className='flex-1'>{providers.chatgpt.title}</span>
+        <ExternalLinkIcon className='size-4 shrink-0' />
+      </a>
     </DropdownMenuItem>
   )
 }
@@ -297,20 +271,17 @@ export type OpenInClaudeProps = ComponentProps<typeof DropdownMenuItem>
 export const OpenInClaude = (props: OpenInClaudeProps) => {
   const { query } = useOpenInContext()
   return (
-    <DropdownMenuItem
-      {...props}
-      render={
-        <a
-          className='flex items-center gap-2'
-          href={providers.claude.createUrl(query)}
-          rel='noopener'
-          target='_blank'
-        />
-      }
-    >
-      <span className='shrink-0'>{providers.claude.icon}</span>
-      <span className='flex-1'>{providers.claude.title}</span>
-      <ExternalLinkIcon className='size-4 shrink-0' />
+    <DropdownMenuItem asChild {...props}>
+      <a
+        className='flex items-center gap-2'
+        href={providers.claude.createUrl(query)}
+        rel='noopener'
+        target='_blank'
+      >
+        <span className='shrink-0'>{providers.claude.icon}</span>
+        <span className='flex-1'>{providers.claude.title}</span>
+        <ExternalLinkIcon className='size-4 shrink-0' />
+      </a>
     </DropdownMenuItem>
   )
 }
@@ -320,20 +291,17 @@ export type OpenInT3Props = ComponentProps<typeof DropdownMenuItem>
 export const OpenInT3 = (props: OpenInT3Props) => {
   const { query } = useOpenInContext()
   return (
-    <DropdownMenuItem
-      {...props}
-      render={
-        <a
-          className='flex items-center gap-2'
-          href={providers.t3.createUrl(query)}
-          rel='noopener'
-          target='_blank'
-        />
-      }
-    >
-      <span className='shrink-0'>{providers.t3.icon}</span>
-      <span className='flex-1'>{providers.t3.title}</span>
-      <ExternalLinkIcon className='size-4 shrink-0' />
+    <DropdownMenuItem asChild {...props}>
+      <a
+        className='flex items-center gap-2'
+        href={providers.t3.createUrl(query)}
+        rel='noopener'
+        target='_blank'
+      >
+        <span className='shrink-0'>{providers.t3.icon}</span>
+        <span className='flex-1'>{providers.t3.title}</span>
+        <ExternalLinkIcon className='size-4 shrink-0' />
+      </a>
     </DropdownMenuItem>
   )
 }
@@ -343,20 +311,17 @@ export type OpenInSciraProps = ComponentProps<typeof DropdownMenuItem>
 export const OpenInScira = (props: OpenInSciraProps) => {
   const { query } = useOpenInContext()
   return (
-    <DropdownMenuItem
-      {...props}
-      render={
-        <a
-          className='flex items-center gap-2'
-          href={providers.scira.createUrl(query)}
-          rel='noopener'
-          target='_blank'
-        />
-      }
-    >
-      <span className='shrink-0'>{providers.scira.icon}</span>
-      <span className='flex-1'>{providers.scira.title}</span>
-      <ExternalLinkIcon className='size-4 shrink-0' />
+    <DropdownMenuItem asChild {...props}>
+      <a
+        className='flex items-center gap-2'
+        href={providers.scira.createUrl(query)}
+        rel='noopener'
+        target='_blank'
+      >
+        <span className='shrink-0'>{providers.scira.icon}</span>
+        <span className='flex-1'>{providers.scira.title}</span>
+        <ExternalLinkIcon className='size-4 shrink-0' />
+      </a>
     </DropdownMenuItem>
   )
 }
@@ -366,20 +331,17 @@ export type OpenInv0Props = ComponentProps<typeof DropdownMenuItem>
 export const OpenInv0 = (props: OpenInv0Props) => {
   const { query } = useOpenInContext()
   return (
-    <DropdownMenuItem
-      {...props}
-      render={
-        <a
-          className='flex items-center gap-2'
-          href={providers.v0.createUrl(query)}
-          rel='noopener'
-          target='_blank'
-        />
-      }
-    >
-      <span className='shrink-0'>{providers.v0.icon}</span>
-      <span className='flex-1'>{providers.v0.title}</span>
-      <ExternalLinkIcon className='size-4 shrink-0' />
+    <DropdownMenuItem asChild {...props}>
+      <a
+        className='flex items-center gap-2'
+        href={providers.v0.createUrl(query)}
+        rel='noopener'
+        target='_blank'
+      >
+        <span className='shrink-0'>{providers.v0.icon}</span>
+        <span className='flex-1'>{providers.v0.title}</span>
+        <ExternalLinkIcon className='size-4 shrink-0' />
+      </a>
     </DropdownMenuItem>
   )
 }
@@ -389,20 +351,17 @@ export type OpenInCursorProps = ComponentProps<typeof DropdownMenuItem>
 export const OpenInCursor = (props: OpenInCursorProps) => {
   const { query } = useOpenInContext()
   return (
-    <DropdownMenuItem
-      {...props}
-      render={
-        <a
-          className='flex items-center gap-2'
-          href={providers.cursor.createUrl(query)}
-          rel='noopener'
-          target='_blank'
-        />
-      }
-    >
-      <span className='shrink-0'>{providers.cursor.icon}</span>
-      <span className='flex-1'>{providers.cursor.title}</span>
-      <ExternalLinkIcon className='size-4 shrink-0' />
+    <DropdownMenuItem asChild {...props}>
+      <a
+        className='flex items-center gap-2'
+        href={providers.cursor.createUrl(query)}
+        rel='noopener'
+        target='_blank'
+      >
+        <span className='shrink-0'>{providers.cursor.icon}</span>
+        <span className='flex-1'>{providers.cursor.title}</span>
+        <ExternalLinkIcon className='size-4 shrink-0' />
+      </a>
     </DropdownMenuItem>
   )
 }

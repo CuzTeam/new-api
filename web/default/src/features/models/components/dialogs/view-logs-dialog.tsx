@@ -1,21 +1,3 @@
-/*
-Copyright (C) 2023-2026 QuantumNous
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
-*/
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Download, Loader2, RefreshCcw, Terminal } from 'lucide-react'
@@ -30,7 +12,6 @@ import {
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -194,29 +175,8 @@ export function ViewLogsDialog({
               {t('Container')}
             </div>
             <Select
-              items={[
-                ...containers.flatMap((c) => {
-                  const id = c?.container_id
-                  if (typeof id !== 'string' || !id) return []
-                  const status =
-                    typeof c?.status === 'string' && c.status
-                      ? ` (${c.status})`
-                      : ''
-                  return [
-                    {
-                      value: id,
-                      label: (
-                        <>
-                          {id}
-                          {status}
-                        </>
-                      ),
-                    },
-                  ]
-                }),
-              ]}
               value={containerId}
-              onValueChange={(v) => v !== null && setContainerId(v)}
+              onValueChange={(v) => setContainerId(v)}
               disabled={isLoadingContainers || containers.length === 0}
             >
               <SelectTrigger>
@@ -230,34 +190,27 @@ export function ViewLogsDialog({
                   }
                 />
               </SelectTrigger>
-              <SelectContent alignItemWithTrigger={false}>
-                <SelectGroup>
-                  {containers.map((c) => {
-                    const id = c?.container_id
-                    if (typeof id !== 'string' || !id) return null
-                    const status =
-                      typeof c?.status === 'string' && c.status
-                        ? ` (${c.status})`
-                        : ''
-                    return (
-                      <SelectItem key={id} value={id}>
-                        {id}
-                        {status}
-                      </SelectItem>
-                    )
-                  })}
-                </SelectGroup>
+              <SelectContent>
+                {containers.map((c) => {
+                  const id = c?.container_id
+                  if (typeof id !== 'string' || !id) return null
+                  const status =
+                    typeof c?.status === 'string' && c.status
+                      ? ` (${c.status})`
+                      : ''
+                  return (
+                    <SelectItem key={id} value={id}>
+                      {id}
+                      {status}
+                    </SelectItem>
+                  )
+                })}
               </SelectContent>
             </Select>
           </div>
           <div className='space-y-1'>
             <div className='text-muted-foreground text-xs'>{t('Stream')}</div>
             <Select
-              items={[
-                { value: 'stdout', label: 'stdout' },
-                { value: 'stderr', label: 'stderr' },
-                { value: 'all', label: 'all' },
-              ]}
               value={stream}
               onValueChange={(v) => {
                 if (v === 'stderr' || v === 'all' || v === 'stdout') {
@@ -270,12 +223,10 @@ export function ViewLogsDialog({
               <SelectTrigger>
                 <SelectValue placeholder={t('Select')} />
               </SelectTrigger>
-              <SelectContent alignItemWithTrigger={false}>
-                <SelectGroup>
-                  <SelectItem value='stdout'>stdout</SelectItem>
-                  <SelectItem value='stderr'>stderr</SelectItem>
-                  <SelectItem value='all'>all</SelectItem>
-                </SelectGroup>
+              <SelectContent>
+                <SelectItem value='stdout'>stdout</SelectItem>
+                <SelectItem value='stderr'>stderr</SelectItem>
+                <SelectItem value='all'>all</SelectItem>
               </SelectContent>
             </Select>
           </div>

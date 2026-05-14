@@ -1,28 +1,9 @@
-/*
-Copyright (C) 2023-2026 QuantumNous
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
-*/
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 @import '@fontsource-variable/public-sans';
 
 @import './theme.css';
-@import './theme-presets.css';
 
 /* Shiki dual themes: token colors follow dark theme (pre background stays `bg-background` on the block) */
 @layer components {
@@ -50,7 +31,7 @@ For commercial licensing, please contact support@quantumnous.com
     scrollbar-gutter: stable;
   }
 
-  /* Keep sticky headers stable while primitives lock body scrolling. */
+  /* Override Radix scroll locking for sticky headers */
   body[data-scroll-locked] {
     overflow: unset !important;
   }
@@ -180,10 +161,10 @@ For commercial licensing, please contact support@quantumnous.com
   overflow: hidden;
 }
 @media (prefers-reduced-motion: no-preference) {
-  .CollapsibleContent[data-open] {
+  .CollapsibleContent[data-state='open'] {
     animation: slideDown 300ms ease-out;
   }
-  .CollapsibleContent:not([data-open]) {
+  .CollapsibleContent[data-state='closed'] {
     animation: slideUp 300ms ease-out;
   }
 }
@@ -193,13 +174,13 @@ For commercial licensing, please contact support@quantumnous.com
     height: 0;
   }
   to {
-    height: var(--collapsible-panel-height);
+    height: var(--radix-collapsible-content-height);
   }
 }
 
 @keyframes slideUp {
   from {
-    height: var(--collapsible-panel-height);
+    height: var(--radix-collapsible-content-height);
   }
   to {
     height: 0;

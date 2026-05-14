@@ -1,21 +1,3 @@
-/*
-Copyright (C) 2023-2026 QuantumNous
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
-*/
 import { useEffect, useMemo, useRef } from 'react'
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
@@ -36,7 +18,6 @@ import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -261,16 +242,6 @@ export function SSRFSection({ defaultValues }: SSRFSectionProps) {
               <FormItem>
                 <FormLabel>{t('Domain Filter Mode')}</FormLabel>
                 <Select
-                  items={[
-                    {
-                      value: 'false',
-                      label: t('Blacklist (Block listed domains)'),
-                    },
-                    {
-                      value: 'true',
-                      label: t('Whitelist (Only allow listed domains)'),
-                    },
-                  ]}
                   onValueChange={(value) => field.onChange(value === 'true')}
                   value={field.value ? 'true' : 'false'}
                 >
@@ -279,15 +250,13 @@ export function SSRFSection({ defaultValues }: SSRFSectionProps) {
                       <SelectValue />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent alignItemWithTrigger={false}>
-                    <SelectGroup>
-                      <SelectItem value='false'>
-                        {t('Blacklist (Block listed domains)')}
-                      </SelectItem>
-                      <SelectItem value='true'>
-                        {t('Whitelist (Only allow listed domains)')}
-                      </SelectItem>
-                    </SelectGroup>
+                  <SelectContent>
+                    <SelectItem value='false'>
+                      {t('Blacklist (Block listed domains)')}
+                    </SelectItem>
+                    <SelectItem value='true'>
+                      {t('Whitelist (Only allow listed domains)')}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <FormDescription>
@@ -326,16 +295,6 @@ export function SSRFSection({ defaultValues }: SSRFSectionProps) {
               <FormItem>
                 <FormLabel>{t('IP Filter Mode')}</FormLabel>
                 <Select
-                  items={[
-                    {
-                      value: 'false',
-                      label: t('Blacklist (Block listed IPs)'),
-                    },
-                    {
-                      value: 'true',
-                      label: t('Whitelist (Only allow listed IPs)'),
-                    },
-                  ]}
                   onValueChange={(value) => field.onChange(value === 'true')}
                   value={field.value ? 'true' : 'false'}
                 >
@@ -344,15 +303,13 @@ export function SSRFSection({ defaultValues }: SSRFSectionProps) {
                       <SelectValue />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent alignItemWithTrigger={false}>
-                    <SelectGroup>
-                      <SelectItem value='false'>
-                        {t('Blacklist (Block listed IPs)')}
-                      </SelectItem>
-                      <SelectItem value='true'>
-                        {t('Whitelist (Only allow listed IPs)')}
-                      </SelectItem>
-                    </SelectGroup>
+                  <SelectContent>
+                    <SelectItem value='false'>
+                      {t('Blacklist (Block listed IPs)')}
+                    </SelectItem>
+                    <SelectItem value='true'>
+                      {t('Whitelist (Only allow listed IPs)')}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <FormDescription>

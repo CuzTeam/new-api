@@ -1,33 +1,14 @@
-/*
-Copyright (C) 2023-2026 QuantumNous
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
-*/
 import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute, redirect } from '@tanstack/react-router'
 import { Loader2, MessageCircleWarning } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { useActiveChatKey } from '@/features/chat/hooks/use-active-chat-key'
 import { useChatPresets } from '@/features/chat/hooks/use-chat-presets'
-import {
-  chatLinkRequiresApiKey,
-  resolveChatUrl,
-} from '@/features/chat/lib/chat-links'
+import { resolveChatUrl } from '@/features/chat/lib/chat-links'
+import { getApiKeys } from '@/features/keys/api'
+import { API_KEY_STATUS } from '@/features/keys/constants'
 
 export const Route = createFileRoute('/_authenticated/chat/$chatId')({
   loader: async ({ params }) => {
@@ -52,7 +33,8 @@ function ChatRouteComponent() {
 
   const requiresActiveKey = useMemo(() => {
     if (!preset || !isWebLink) return false
-    return chatLinkRequiresApiKey(preset.url ?? '')
+    const url = preset.url ?? ''
+    return url.includes('{key}') || url.includes('{cherryConfig}')
   }, [isWebLink, preset])
 
   const {
@@ -60,7 +42,28 @@ function ChatRouteComponent() {
     isPending,
     isError,
     error,
-  } = useActiveChatKey(Boolean(preset && requiresActiveKey))
+  } = useQuery({
+    queryKey: ['chat-active-key'],
+    queryFn: async () => {
+      const result = await getApiKeys({ p: 1, size: 50 })
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to load API keys')
+      }
+      const items = result.data?.items ?? []
+      const active = items.find(
+        (item) => item.status === API_KEY_STATUS.ENABLED
+      )
+      if (!active) {
+        throw new Error(
+          'No enabled API key available. Please enable an API key first.'
+        )
+      }
+      return active.key
+    },
+    enabled: Boolean(preset && requiresActiveKey),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  })
 
   const iframeSrc = useMemo(() => {
     if (!preset || !isWebLink) return ''
@@ -84,8 +87,8 @@ function ChatRouteComponent() {
             {t('The requested chat preset does not exist or has been removed.')}
           </p>
         </div>
-        <Button variant='outline' render={<Link to='/dashboard' />}>
-          {t('Return to dashboard')}
+        <Button variant='outline' asChild>
+          <Link to='/dashboard'>{t('Return to dashboard')}</Link>
         </Button>
       </div>
     )
@@ -104,8 +107,8 @@ function ChatRouteComponent() {
             )}
           </p>
         </div>
-        <Button variant='outline' render={<Link to='/dashboard' />}>
-          {t('Return to dashboard')}
+        <Button variant='outline' asChild>
+          <Link to='/dashboard'>{t('Return to dashboard')}</Link>
         </Button>
       </div>
     )

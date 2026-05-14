@@ -1,21 +1,3 @@
-/*
-Copyright (C) 2023-2026 QuantumNous
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
-*/
 import * as z from 'zod'
 import { redirect } from '@tanstack/react-router'
 
@@ -47,7 +29,7 @@ export type SettingsRouteConfigOptions<
   defaultSection: TSectionId
   /** Settings component to render */
   component: TComponent
-  /** Route path for redirect (e.g., '/system-settings/site') */
+  /** Route path for redirect (e.g., '/system-settings/general') */
   routePath: string
   /** Whether to redirect to default section if no section is provided (default: false) */
   redirectToDefault?: boolean
@@ -62,12 +44,12 @@ export type SettingsRouteConfigOptions<
  *
  * @example
  * ```tsx
- * export const Route = createFileRoute('/_authenticated/system-settings/site')(
+ * export const Route = createFileRoute('/_authenticated/system-settings/general')(
  *   createSettingsRouteConfig({
- *     sectionIds: SITE_SECTION_IDS,
- *     defaultSection: SITE_DEFAULT_SECTION,
- *     component: SiteSettings,
- *     routePath: '/system-settings/site',
+ *     sectionIds: GENERAL_SECTION_IDS,
+ *     defaultSection: GENERAL_DEFAULT_SECTION,
+ *     component: GeneralSettings,
+ *     routePath: '/system-settings/general',
  *     redirectToDefault: true,
  *   })
  * )

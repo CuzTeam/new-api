@@ -1,21 +1,3 @@
-/*
-Copyright (C) 2023-2026 QuantumNous
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
-*/
 import { useState, useEffect, useRef, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -58,8 +40,7 @@ const ACCENT_CLASSES: Record<
   blue: {
     activeText: 'text-blue-600 dark:text-blue-400',
     activeBorder: 'border-blue-500 dark:border-blue-400',
-    badge:
-      'bg-blue-500/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400',
+    badge: 'bg-blue-500/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400',
   },
   violet: {
     activeText: 'text-violet-600 dark:text-violet-400',
@@ -99,7 +80,10 @@ const API_DEMOS: ApiDemoConfig[] = [
     method: 'POST',
     endpoint: '/v1/responses',
     headers: ['"Authorization: Bearer sk-••••"'],
-    request: ['"model": "your-model",', '"input": "..."'],
+    request: [
+      '"model": "your-model",',
+      '"input": "..."',
+    ],
     response: [
       '{',
       '  "output": [{ "type": "output_text", "text": <text> }],',
@@ -225,10 +209,10 @@ export function HeroTerminalDemo() {
                 key={item.id}
                 onClick={() => handleSelect(index)}
                 className={cn(
-                  'relative -mb-px flex items-center gap-1.5 border-b-2 px-2.5 py-2.5 text-[11px] font-medium tracking-wide transition-colors sm:px-3 sm:text-xs',
+                  '-mb-px relative flex items-center gap-1.5 border-b-2 px-2.5 py-2.5 text-[11px] font-medium tracking-wide transition-colors sm:px-3 sm:text-xs',
                   isActive
                     ? `${tone.activeBorder} ${tone.activeText}`
-                    : 'text-foreground/40 hover:text-foreground/70 border-transparent'
+                    : 'border-transparent text-foreground/40 hover:text-foreground/70'
                 )}
               >
                 {item.label}
@@ -237,7 +221,7 @@ export function HeroTerminalDemo() {
           })}
           <div className='ml-auto flex items-center gap-2 pr-2 sm:pr-3'>
             <span className='inline-block size-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.45)]' />
-            <span className='text-foreground/40 font-mono text-[10px] tracking-wider uppercase'>
+            <span className='font-mono text-[10px] tracking-wider text-foreground/40 uppercase'>
               200 ok
             </span>
           </div>
@@ -260,7 +244,7 @@ export function HeroTerminalDemo() {
           </span>
           <code
             className={cn(
-              'text-foreground/75 truncate font-mono text-[12.5px] transition-opacity duration-200',
+              'truncate font-mono text-[12.5px] text-foreground/75 transition-opacity duration-200',
               transitioning ? 'opacity-0' : 'opacity-100'
             )}
           >
@@ -284,17 +268,17 @@ export function HeroTerminalDemo() {
             'border-border/40 bg-muted/30 dark:border-white/[0.05] dark:bg-white/[0.02]'
           )}
         >
-          <div className='text-foreground/40 flex items-center gap-3 text-[10px] tabular-nums'>
+          <div className='flex items-center gap-3 text-[10px] tabular-nums text-foreground/40'>
             <span className='flex items-center gap-1'>
               <span className='font-mono'>{demo.latency}</span>
               <span className='tracking-wider uppercase'>ms</span>
             </span>
-            <span className='bg-foreground/15 size-1 rounded-full' />
+            <span className='size-1 rounded-full bg-foreground/15' />
             <span className='flex items-center gap-1'>
               <span className='font-mono'>{demo.tokens}</span>
               <span className='tracking-wider uppercase'>tokens</span>
             </span>
-            <span className='bg-foreground/15 size-1 rounded-full' />
+            <span className='size-1 rounded-full bg-foreground/15' />
             <span className='flex items-center gap-1'>
               <span className='tracking-wider uppercase'>cost</span>
               <span className='font-mono'>
@@ -302,7 +286,7 @@ export function HeroTerminalDemo() {
               </span>
             </span>
           </div>
-          <span className='text-foreground/30 font-mono text-[10px] tracking-wider uppercase'>
+          <span className='font-mono text-[10px] tracking-wider text-foreground/30 uppercase'>
             stream · sse
           </span>
         </div>
@@ -368,7 +352,9 @@ function ResponseBlock(props: { demo: ApiDemoConfig; transitioning: boolean }) {
         )}
       >
         {demo.response.map((line, i) => (
-          <CodeLine key={i}>{renderResponseLine(line, demo)}</CodeLine>
+          <CodeLine key={i}>
+            {renderResponseLine(line, demo)}
+          </CodeLine>
         ))}
       </div>
     </div>
@@ -377,7 +363,7 @@ function ResponseBlock(props: { demo: ApiDemoConfig; transitioning: boolean }) {
 
 function SectionLabel(props: { children: ReactNode }) {
   return (
-    <span className='text-foreground/30 font-sans text-[10px] font-semibold tracking-[0.18em] uppercase'>
+    <span className='font-sans text-[10px] font-semibold tracking-[0.18em] text-foreground/30 uppercase'>
       {props.children}
     </span>
   )
@@ -415,7 +401,9 @@ function renderResponseLine(line: string, demo: ApiDemoConfig): ReactNode {
         </Accent>
       )
     } else if (placeholder === '<tokens>') {
-      segments.push(<NumberText key={`ph-${idx}`}>{demo.tokens}</NumberText>)
+      segments.push(
+        <NumberText key={`ph-${idx}`}>{demo.tokens}</NumberText>
+      )
     } else if (placeholder === '<in>') {
       segments.push(
         <NumberText key={`ph-${idx}`}>
@@ -484,7 +472,7 @@ function tokenize(input: string): ReactNode {
 
 function CodeLine(props: { children: ReactNode; indent?: number }) {
   return (
-    <div className='break-words whitespace-pre-wrap'>
+    <div className='whitespace-pre-wrap break-words'>
       {props.indent ? (
         <span
           aria-hidden
@@ -537,7 +525,5 @@ function Muted(props: { children: ReactNode }) {
 
 function Accent(props: { children: ReactNode; accent: AccentTone }) {
   const tone = ACCENT_CLASSES[props.accent]
-  return (
-    <span className={cn('font-medium', tone.activeText)}>{props.children}</span>
-  )
+  return <span className={cn('font-medium', tone.activeText)}>{props.children}</span>
 }

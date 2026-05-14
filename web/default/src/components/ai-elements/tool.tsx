@@ -1,21 +1,3 @@
-/*
-Copyright (C) 2023-2026 QuantumNous
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
-*/
 'use client'
 
 import { type ComponentProps, isValidElement, type ReactNode } from 'react'
@@ -75,15 +57,15 @@ const getStatusBadge = (status: ExtendedToolState) => {
   const icons: Record<ExtendedToolState, ReactNode> = {
     'input-streaming': <CircleIcon className='size-4' />,
     'input-available': <ClockIcon className='size-4 animate-pulse' />,
-    'approval-requested': <ClockIcon className='text-warning size-4' />,
-    'approval-responded': <CheckCircleIcon className='text-info size-4' />,
-    'output-available': <CheckCircleIcon className='text-success size-4' />,
-    'output-error': <XCircleIcon className='text-destructive size-4' />,
-    'output-denied': <XCircleIcon className='text-warning size-4' />,
+    'approval-requested': <ClockIcon className='size-4 text-yellow-600' />,
+    'approval-responded': <CheckCircleIcon className='size-4 text-blue-600' />,
+    'output-available': <CheckCircleIcon className='size-4 text-green-600' />,
+    'output-error': <XCircleIcon className='size-4 text-red-600' />,
+    'output-denied': <XCircleIcon className='size-4 text-orange-600' />,
   }
 
   return (
-    <Badge className='gap-1.5 text-xs' variant='secondary'>
+    <Badge className='gap-1.5 rounded-full text-xs' variant='secondary'>
       {icons[status]}
       {labels[status]}
     </Badge>
@@ -99,7 +81,7 @@ export const ToolHeader = ({
 }: ToolHeaderProps) => (
   <CollapsibleTrigger
     className={cn(
-      'group flex w-full items-center justify-between gap-4 p-3',
+      'flex w-full items-center justify-between gap-4 p-3',
       className
     )}
     {...props}
@@ -111,7 +93,7 @@ export const ToolHeader = ({
       </span>
       {getStatusBadge(state)}
     </div>
-    <ChevronDownIcon className='text-muted-foreground size-4 transition-transform group-data-[panel-open]:rotate-180' />
+    <ChevronDownIcon className='text-muted-foreground size-4 transition-transform group-data-[state=open]:rotate-180' />
   </CollapsibleTrigger>
 )
 
@@ -120,7 +102,7 @@ export type ToolContentProps = ComponentProps<typeof CollapsibleContent>
 export const ToolContent = ({ className, ...props }: ToolContentProps) => (
   <CollapsibleContent
     className={cn(
-      'data-closed:fade-out-0 data-closed:slide-out-to-top-2 data-open:slide-in-from-top-2 text-popover-foreground data-closed:animate-out data-open:animate-in outline-none',
+      'data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 text-popover-foreground data-[state=closed]:animate-out data-[state=open]:animate-in outline-none',
       className
     )}
     {...props}

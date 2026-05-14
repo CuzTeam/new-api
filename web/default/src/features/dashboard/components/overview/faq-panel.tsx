@@ -1,21 +1,3 @@
-/*
-Copyright (C) 2023-2026 QuantumNous
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
-*/
 import { HelpCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -42,15 +24,13 @@ export function FAQPanel() {
           {t('FAQ')}
         </span>
       }
-      description={t('Answers for common access and billing questions')}
       loading={loading}
       empty={!list.length}
       emptyMessage={t('No FAQ entries available')}
-      height='h-80'
-      contentClassName='p-0'
+      height='h-64 sm:h-80'
     >
-      <ScrollArea className='h-80'>
-        <Accordion className='w-full px-4 sm:px-5'>
+      <ScrollArea className='h-64 sm:h-80'>
+        <Accordion type='single' collapsible className='w-full'>
           {list.map((item: FAQItem, idx: number) => {
             const key = item.id ?? `faq-${idx}`
             const value = `item-${key}`

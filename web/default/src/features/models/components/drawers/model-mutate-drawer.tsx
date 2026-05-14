@@ -1,21 +1,3 @@
-/*
-Copyright (C) 2023-2026 QuantumNous
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
-*/
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
@@ -45,7 +27,6 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -187,13 +168,6 @@ export function ModelMutateDrawer({
       'group_ratio_setting.group_special_usable_group': '{}',
       'grok.violation_deduction_enabled': false,
       'grok.violation_deduction_amount': 0,
-      'channel_affinity_setting.enabled': false,
-      'channel_affinity_setting.switch_on_success': true,
-      'channel_affinity_setting.max_entries': 100000,
-      'channel_affinity_setting.default_ttl_seconds': 3600,
-      'channel_affinity_setting.rules': '[]',
-      'model_deployment.ionet.api_key': '',
-      'model_deployment.ionet.enabled': false,
     }
     return getOptionValue(systemOptionsData.data, defaultModelSettings)
   }, [systemOptionsData])
@@ -720,12 +694,6 @@ export function ModelMutateDrawer({
                   <FormItem>
                     <FormLabel>{t('Vendor')}</FormLabel>
                     <Select
-                      items={[
-                        ...vendors.map((vendor) => ({
-                          value: String(vendor.id),
-                          label: vendor.name,
-                        })),
-                      ]}
                       onValueChange={(value) =>
                         field.onChange(value ? parseInt(value) : undefined)
                       }
@@ -736,17 +704,12 @@ export function ModelMutateDrawer({
                           <SelectValue placeholder={t('Select vendor')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent alignItemWithTrigger={false}>
-                        <SelectGroup>
-                          {vendors.map((vendor) => (
-                            <SelectItem
-                              key={vendor.id}
-                              value={String(vendor.id)}
-                            >
-                              {vendor.name}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
+                      <SelectContent>
+                        {vendors.map((vendor) => (
+                          <SelectItem key={vendor.id} value={String(vendor.id)}>
+                            {vendor.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -830,28 +793,16 @@ export function ModelMutateDrawer({
             <div className='space-y-4'>
               <div className='flex items-center justify-between'>
                 <h3 className='text-sm font-semibold'>{t('Endpoints')}</h3>
-                <Select<string>
-                  items={[
-                    ...Object.keys(ENDPOINT_TEMPLATES).map((key) => ({
-                      value: key,
-                      label: key,
-                    })),
-                  ]}
-                  onValueChange={(v) =>
-                    v !== null && handleFillEndpointTemplate(v)
-                  }
-                >
+                <Select onValueChange={handleFillEndpointTemplate}>
                   <SelectTrigger size='sm' className='w-[200px]'>
                     <SelectValue placeholder={t('Load template...')} />
                   </SelectTrigger>
-                  <SelectContent alignItemWithTrigger={false}>
-                    <SelectGroup>
-                      {Object.keys(ENDPOINT_TEMPLATES).map((key) => (
-                        <SelectItem key={key} value={key}>
-                          {key}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
+                  <SelectContent>
+                    {Object.keys(ENDPOINT_TEMPLATES).map((key) => (
+                      <SelectItem key={key} value={key}>
+                        {key}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -1098,21 +1049,19 @@ export function ModelMutateDrawer({
                     open={advancedOpen}
                     onOpenChange={setAdvancedOpen}
                   >
-                    <CollapsibleTrigger
-                      render={
-                        <Button
-                          type='button'
-                          variant='outline'
-                          className='flex w-full items-center justify-between'
+                    <CollapsibleTrigger asChild>
+                      <Button
+                        type='button'
+                        variant='outline'
+                        className='flex w-full items-center justify-between'
+                      >
+                        {t('Advanced options')}
+                        <ChevronDown
+                          className={`h-4 w-4 transition-transform duration-200 ${
+                            advancedOpen ? 'rotate-180' : ''
+                          }`}
                         />
-                      }
-                    >
-                      {t('Advanced options')}
-                      <ChevronDown
-                        className={`h-4 w-4 transition-transform duration-200 ${
-                          advancedOpen ? 'rotate-180' : ''
-                        }`}
-                      />
+                      </Button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className='space-y-6 pt-6'>
                       <FormField
@@ -1284,10 +1233,10 @@ export function ModelMutateDrawer({
         </Form>
 
         <SheetFooter className='grid grid-cols-2 gap-2 border-t px-4 py-3 sm:flex sm:px-6 sm:py-4'>
-          <SheetClose
-            render={<Button variant='outline' disabled={isSubmitting} />}
-          >
-            {t('Cancel')}
+          <SheetClose asChild>
+            <Button variant='outline' disabled={isSubmitting}>
+              {t('Cancel')}
+            </Button>
           </SheetClose>
           <Button form='model-form' type='submit' disabled={isSubmitting}>
             {isSubmitting && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}

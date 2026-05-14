@@ -55,9 +55,9 @@ export function AvailabilityTable({ data }: { data: ModelAvailability[] }) {
                   <TableCell className='whitespace-nowrap'>
                     {primaryChannel ? (
                       hasMultipleChannels ? (
-                        <TooltipProvider>
+                        <TooltipProvider delayDuration={100}>
                           <Tooltip>
-                            <TooltipTrigger>
+                            <TooltipTrigger asChild>
                               <span>
                                 <Badge color={stringToColor(primaryChannel.channel_name) as BadgeColor}>
                                   {primaryChannel.channel_name}

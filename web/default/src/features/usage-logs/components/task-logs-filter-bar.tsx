@@ -1,29 +1,11 @@
-/*
-Copyright (C) 2023-2026 QuantumNous
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
-*/
-import { useState, useEffect, useCallback } from 'react'
-import { useQueryClient, useIsFetching } from '@tanstack/react-query'
+import { useState, useEffect, useCallback, type ReactNode } from 'react'
 import { useNavigate, getRouteApi } from '@tanstack/react-router'
-import { type Table } from '@tanstack/react-table'
+import { useQueryClient, useIsFetching } from '@tanstack/react-query'
+import { Loader2, RotateCcw, Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useIsAdmin } from '@/hooks/use-admin'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { DataTableToolbar } from '@/components/data-table'
 import { buildSearchParams } from '../lib/filter'
 import { getDefaultTimeRange } from '../lib/utils'
 import type { DrawingLogFilters, LogCategory, TaskLogFilters } from '../types'
@@ -34,9 +16,13 @@ const route = getRouteApi('/_authenticated/usage-logs/$section')
 type TaskLikeLogCategory = Extract<LogCategory, 'drawing' | 'task'>
 type TaskLogsFilters = DrawingLogFilters | TaskLogFilters
 
-interface TaskLogsFilterBarProps<TData> {
-  table: Table<TData>
+interface TaskLogsFilterBarProps {
   logCategory: TaskLikeLogCategory
+  viewOptions?: ReactNode
+}
+
+function getFilterPlaceholder(_logCategory: TaskLikeLogCategory): string {
+  return 'Filter by task ID'
 }
 
 function getFilterValue(
@@ -60,7 +46,7 @@ function setFilterValue(
   return { ...filters, taskId: value }
 }
 
-export function TaskLogsFilterBar<TData>(props: TaskLogsFilterBarProps<TData>) {
+export function TaskLogsFilterBar(props: TaskLogsFilterBarProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -76,13 +62,9 @@ export function TaskLogsFilterBar<TData>(props: TaskLogsFilterBarProps<TData>) {
   useEffect(() => {
     const { start, end } = getDefaultTimeRange()
     const baseFilters = {
-      startTime: searchParams.startTime
-        ? new Date(searchParams.startTime)
-        : start,
+      startTime: searchParams.startTime ? new Date(searchParams.startTime) : start,
       endTime: searchParams.endTime ? new Date(searchParams.endTime) : end,
-      ...(searchParams.channel
-        ? { channel: String(searchParams.channel) }
-        : {}),
+      ...(searchParams.channel ? { channel: String(searchParams.channel) } : {}),
     }
     const next: TaskLogsFilters =
       props.logCategory === 'drawing'
@@ -155,18 +137,9 @@ export function TaskLogsFilterBar<TData>(props: TaskLogsFilterBarProps<TData>) {
     [props.logCategory]
   )
 
-  const filterValue = getFilterValue(filters, props.logCategory)
-  const placeholder =
-    props.logCategory === 'drawing'
-      ? t('Filter by Midjourney task ID')
-      : t('Filter by task ID')
-  const inputClass = 'w-full sm:w-[180px] lg:w-[200px]'
-  const hasAdditionalFilters = !!filterValue || !!filters.channel
-
   return (
-    <DataTableToolbar
-      table={props.table}
-      customSearch={
+    <div className='space-y-2 sm:space-y-3'>
+      <div className='grid grid-cols-2 gap-1.5 sm:gap-2 lg:grid-cols-[minmax(280px,2fr)_minmax(180px,1fr)_minmax(120px,0.8fr)_auto]'>
         <CompactDateTimeRangePicker
           start={filters.startTime}
           end={filters.endTime}
@@ -174,34 +147,51 @@ export function TaskLogsFilterBar<TData>(props: TaskLogsFilterBarProps<TData>) {
             handleChange('startTime', start)
             handleChange('endTime', end)
           }}
-          className='w-full sm:w-[340px]'
+          className='col-span-2 lg:col-span-1'
         />
-      }
-      additionalSearch={
-        <>
+        <Input
+          aria-label={t('Task ID')}
+          placeholder={t(getFilterPlaceholder(props.logCategory))}
+          value={getFilterValue(filters, props.logCategory)}
+          onChange={(e) => handleFilterChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className='h-9'
+        />
+        {isAdmin && (
           <Input
-            aria-label={t('Task ID')}
-            placeholder={placeholder}
-            value={filterValue}
-            onChange={(e) => handleFilterChange(e.target.value)}
+            placeholder={t('Channel ID')}
+            value={filters.channel || ''}
+            onChange={(e) => handleChange('channel', e.target.value)}
             onKeyDown={handleKeyDown}
-            className={inputClass}
+            className='h-9'
           />
-          {isAdmin && (
-            <Input
-              placeholder={t('Channel ID')}
-              value={filters.channel || ''}
-              onChange={(e) => handleChange('channel', e.target.value)}
-              onKeyDown={handleKeyDown}
-              className={inputClass}
-            />
-          )}
-        </>
-      }
-      hasAdditionalFilters={hasAdditionalFilters}
-      onSearch={handleApply}
-      searchLoading={fetchingLogs > 0}
-      onReset={handleReset}
-    />
+        )}
+        <div className='col-span-2 flex shrink-0 items-center justify-end gap-1.5 sm:gap-2 lg:col-span-1'>
+          <Button
+            variant='outline'
+            size='sm'
+            className='h-8'
+            onClick={handleReset}
+          >
+            <RotateCcw className='size-3.5' />
+            {t('Reset')}
+          </Button>
+          <Button
+            size='sm'
+            className='h-8'
+            onClick={handleApply}
+            disabled={fetchingLogs > 0}
+          >
+            {fetchingLogs > 0 ? (
+              <Loader2 className='size-3.5 animate-spin' />
+            ) : (
+              <Search className='size-3.5' />
+            )}
+            {t('Search')}
+          </Button>
+          {props.viewOptions}
+        </div>
+      </div>
+    </div>
   )
 }

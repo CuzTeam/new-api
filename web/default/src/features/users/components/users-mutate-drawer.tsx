@@ -1,21 +1,3 @@
-/*
-Copyright (C) 2023-2026 QuantumNous
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
-*/
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -40,7 +22,6 @@ import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -220,12 +201,8 @@ export function UsersMutateDrawer({
                       <FormItem>
                         <FormLabel>{t('Role')}</FormLabel>
                         <Select
-                          items={[
-                            { value: '1', label: t('Common User') },
-                            { value: '10', label: t('Admin') },
-                          ]}
                           onValueChange={(value) =>
-                            value !== null && field.onChange(parseInt(value))
+                            field.onChange(parseInt(value))
                           }
                           value={String(field.value)}
                         >
@@ -234,13 +211,11 @@ export function UsersMutateDrawer({
                               <SelectValue placeholder={t('Select a role')} />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent alignItemWithTrigger={false}>
-                            <SelectGroup>
-                              <SelectItem value='1'>
-                                {t('Common User')}
-                              </SelectItem>
-                              <SelectItem value='10'>{t('Admin')}</SelectItem>
-                            </SelectGroup>
+                          <SelectContent>
+                            <SelectItem value='1'>
+                              {t('Common User')}
+                            </SelectItem>
+                            <SelectItem value='10'>{t('Admin')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormDescription>
@@ -307,12 +282,6 @@ export function UsersMutateDrawer({
                       <FormItem>
                         <FormLabel>{t('Group')}</FormLabel>
                         <Select
-                          items={[
-                            ...groups.map((group) => ({
-                              value: group,
-                              label: group,
-                            })),
-                          ]}
                           onValueChange={field.onChange}
                           value={field.value}
                         >
@@ -321,14 +290,12 @@ export function UsersMutateDrawer({
                               <SelectValue placeholder={t('Select a group')} />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent alignItemWithTrigger={false}>
-                            <SelectGroup>
-                              {groups.map((group) => (
-                                <SelectItem key={group} value={group}>
-                                  {group}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
+                          <SelectContent>
+                            {groups.map((group) => (
+                              <SelectItem key={group} value={group}>
+                                {group}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -430,8 +397,8 @@ export function UsersMutateDrawer({
             </form>
           </Form>
           <SheetFooter className='grid grid-cols-2 gap-2 border-t px-4 py-3 sm:flex sm:px-6 sm:py-4'>
-            <SheetClose render={<Button variant='outline' />}>
-              {t('Close')}
+            <SheetClose asChild>
+              <Button variant='outline'>{t('Close')}</Button>
             </SheetClose>
             <Button form='user-form' type='submit' disabled={isSubmitting}>
               {isSubmitting ? t('Saving...') : t('Save changes')}
