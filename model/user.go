@@ -81,7 +81,7 @@ func (user *User) SetAccessToken(token string) {
 func (user *User) GetSetting() dto.UserSetting {
 	setting := dto.UserSetting{}
 	if user.Setting != "" {
-		err := json.Unmarshal([]byte(user.Setting), &setting)
+		err := common.Unmarshal([]byte(user.Setting), &setting)
 		if err != nil {
 			common.SysLog("failed to unmarshal setting: " + err.Error())
 		}
@@ -90,7 +90,7 @@ func (user *User) GetSetting() dto.UserSetting {
 }
 
 func (user *User) SetSetting(setting dto.UserSetting) {
-	settingBytes, err := json.Marshal(setting)
+	settingBytes, err := common.Marshal(setting)
 	if err != nil {
 		common.SysLog("failed to marshal setting: " + err.Error())
 		return
@@ -509,6 +509,9 @@ func (user *User) Update(updatePassword bool) error {
 	newUser := *user
 	DB.First(&user, user.Id)
 	if err = DB.Model(user).Updates(newUser).Error; err != nil {
+		return err
+	}
+	if err = DB.First(user, user.Id).Error; err != nil {
 		return err
 	}
 

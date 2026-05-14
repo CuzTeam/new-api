@@ -92,12 +92,21 @@ func Login(c *gin.Context) {
 // setup session & cookies and then return user info
 func setupLogin(user *model.User, c *gin.Context) {
 	model.UpdateUserLastLoginAt(user.Id)
+	theme := common.NormalizeFrontendTheme(user.GetSetting().FrontendTheme)
+	if theme != "" {
+		common.SetFrontendThemeCookie(c, theme)
+	}
 	session := sessions.Default(c)
 	session.Set("id", user.Id)
 	session.Set("username", user.Username)
 	session.Set("role", user.Role)
 	session.Set("status", user.Status)
 	session.Set("group", user.Group)
+	if theme != "" {
+		session.Set(common.FrontendThemeSessionKey, theme)
+	} else {
+		session.Delete(common.FrontendThemeSessionKey)
+	}
 	err := session.Save()
 	if err != nil {
 		common.ApiErrorI18n(c, i18n.MsgUserSessionSaveFailed)
@@ -387,6 +396,14 @@ func GetSelf(c *gin.Context) {
 
 	// 获取用户设置并提取sidebar_modules
 	userSetting := user.GetSetting()
+	if theme := common.NormalizeFrontendTheme(userSetting.FrontendTheme); theme != "" {
+		common.SetFrontendThemeCookie(c, theme)
+		session := sessions.Default(c)
+		if common.Interface2String(session.Get(common.FrontendThemeSessionKey)) != theme {
+			session.Set(common.FrontendThemeSessionKey, theme)
+			_ = session.Save()
+		}
+	}
 
 	// 构建响应数据，包含用户信息和权限
 	responseData := map[string]interface{}{
@@ -625,107 +642,141 @@ func AdminClearUserBinding(c *gin.Context) {
 
 func UpdateSelf(c *gin.Context) {
 	var requestData map[string]interface{}
-	err := json.NewDecoder(c.Request.Body).Decode(&requestData)
-	if err != nil {
+	if err := common.DecodeJson(c.Request.Body, &requestData); err != nil {
 		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
 		return
 	}
 
-	// 检查是否是用户设置更新请求 (sidebar_modules 或 language)
-	if sidebarModules, sidebarExists := requestData["sidebar_modules"]; sidebarExists {
-		userId := c.GetInt("id")
+	userId := c.GetInt("id")
+	settingChanged := false
+	updatedTheme := ""
+	var updatedSetting *dto.UserSetting
+
+	for _, key := range []string{"sidebar_modules", "frontend_theme", "language"} {
+		if _, ok := requestData[key]; ok {
+			settingChanged = true
+			break
+		}
+	}
+
+	if settingChanged {
 		user, err := model.GetUserById(userId, false)
 		if err != nil {
 			common.ApiError(c, err)
 			return
 		}
 
-		// 获取当前用户设置
 		currentSetting := user.GetSetting()
 
-		// 更新sidebar_modules字段
-		if sidebarModulesStr, ok := sidebarModules.(string); ok {
+		if sidebarModules, ok := requestData["sidebar_modules"]; ok {
+			sidebarModulesStr, valid := sidebarModules.(string)
+			if !valid {
+				common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+				return
+			}
 			currentSetting.SidebarModules = sidebarModulesStr
 		}
 
-		// 保存更新后的设置
-		user.SetSetting(currentSetting)
-		if err := user.Update(false); err != nil {
-			common.ApiErrorI18n(c, i18n.MsgUpdateFailed)
+		if frontendTheme, ok := requestData["frontend_theme"]; ok {
+			themeStr, valid := frontendTheme.(string)
+			if !valid {
+				common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+				return
+			}
+			themeStr = common.NormalizeFrontendTheme(themeStr)
+			if themeStr == "" {
+				common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+				return
+			}
+			currentSetting.FrontendTheme = themeStr
+			updatedTheme = themeStr
+		}
+
+		if language, ok := requestData["language"]; ok {
+			langStr, valid := language.(string)
+			if !valid {
+				common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+				return
+			}
+			currentSetting.Language = langStr
+		}
+
+		updatedSetting = &currentSetting
+	}
+
+	hasProfileUpdate := false
+	for _, key := range []string{"username", "display_name", "password", "original_password"} {
+		if _, ok := requestData[key]; ok {
+			hasProfileUpdate = true
+			break
+		}
+	}
+
+	if hasProfileUpdate {
+		var user model.User
+		requestDataBytes, err := common.Marshal(requestData)
+		if err != nil {
+			common.ApiErrorI18n(c, i18n.MsgInvalidParams)
+			return
+		}
+		err = common.Unmarshal(requestDataBytes, &user)
+		if err != nil {
+			common.ApiErrorI18n(c, i18n.MsgInvalidParams)
 			return
 		}
 
-		common.ApiSuccessI18n(c, i18n.MsgUpdateSuccess, nil)
+		if user.Password == "" {
+			user.Password = "$I_LOVE_U" // make Validator happy :)
+		}
+		if err := common.Validate.Struct(&user); err != nil {
+			common.ApiErrorI18n(c, i18n.MsgInvalidInput)
+			return
+		}
+
+		cleanUser := model.User{
+			Id:          userId,
+			Username:    user.Username,
+			Password:    user.Password,
+			DisplayName: user.DisplayName,
+		}
+		if user.Password == "$I_LOVE_U" {
+			user.Password = ""
+			cleanUser.Password = ""
+		}
+		updatePassword, err := checkUpdatePassword(user.OriginalPassword, user.Password, cleanUser.Id)
+		if err != nil {
+			common.ApiError(c, err)
+			return
+		}
+		if err := cleanUser.Update(updatePassword); err != nil {
+			common.ApiError(c, err)
+			return
+		}
+	}
+
+	if !settingChanged && !hasProfileUpdate {
+		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
 		return
 	}
 
-	// 检查是否是语言偏好更新请求
-	if language, langExists := requestData["language"]; langExists {
-		userId := c.GetInt("id")
+	if updatedSetting != nil {
 		user, err := model.GetUserById(userId, false)
 		if err != nil {
 			common.ApiError(c, err)
 			return
 		}
-
-		// 获取当前用户设置
-		currentSetting := user.GetSetting()
-
-		// 更新language字段
-		if langStr, ok := language.(string); ok {
-			currentSetting.Language = langStr
-		}
-
-		// 保存更新后的设置
-		user.SetSetting(currentSetting)
+		user.SetSetting(*updatedSetting)
 		if err := user.Update(false); err != nil {
 			common.ApiErrorI18n(c, i18n.MsgUpdateFailed)
 			return
 		}
-
-		common.ApiSuccessI18n(c, i18n.MsgUpdateSuccess, nil)
-		return
 	}
 
-	// 原有的用户信息更新逻辑
-	var user model.User
-	requestDataBytes, err := json.Marshal(requestData)
-	if err != nil {
-		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
-		return
-	}
-	err = json.Unmarshal(requestDataBytes, &user)
-	if err != nil {
-		common.ApiErrorI18n(c, i18n.MsgInvalidParams)
-		return
-	}
-
-	if user.Password == "" {
-		user.Password = "$I_LOVE_U" // make Validator happy :)
-	}
-	if err := common.Validate.Struct(&user); err != nil {
-		common.ApiErrorI18n(c, i18n.MsgInvalidInput)
-		return
-	}
-
-	cleanUser := model.User{
-		Id:          c.GetInt("id"),
-		Username:    user.Username,
-		Password:    user.Password,
-		DisplayName: user.DisplayName,
-	}
-	if user.Password == "$I_LOVE_U" {
-		user.Password = "" // rollback to what it should be
-		cleanUser.Password = ""
-	}
-	updatePassword, err := checkUpdatePassword(user.OriginalPassword, user.Password, cleanUser.Id)
-	if err != nil {
-		common.ApiError(c, err)
-		return
-	}
-	if err := cleanUser.Update(updatePassword); err != nil {
-		common.ApiError(c, err)
-		return
+	if updatedTheme != "" {
+		common.SetFrontendThemeCookie(c, updatedTheme)
+		session := sessions.Default(c)
+		session.Set(common.FrontendThemeSessionKey, updatedTheme)
+		_ = session.Save()
 	}
 
 	c.JSON(http.StatusOK, gin.H{

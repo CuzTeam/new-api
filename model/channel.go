@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -354,23 +353,6 @@ func GetChannelById(id int, selectAll bool) (*Channel, error) {
 		return nil, errors.New("channel not found")
 	}
 	return channel, nil
-}
-
-func GetChannelByName(name string) (*Channel, error) {
-	var channel Channel
-	err := DB.Where("name = ? AND status = ?", name, common.ChannelStatusEnabled).First(&channel).Error
-	if err != nil {
-		return nil, err
-	}
-	return &channel, nil
-}
-
-func GetChannelByIdOrName(identifier string) (*Channel, error) {
-	id, err := strconv.Atoi(identifier)
-	if err == nil {
-		return CacheGetChannel(id)
-	}
-	return CacheGetChannelByName(identifier)
 }
 
 func BatchInsertChannels(channels []Channel) error {

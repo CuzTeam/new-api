@@ -67,7 +67,6 @@ export type GeneralSettings = {
   DemoSiteEnabled: boolean
   SelfUseModeEnabled: boolean
   AutoAcceptUnpricedModel: boolean
-  'channel_selection_setting.enabled': boolean
   'checkin_setting.enabled': boolean
   'checkin_setting.min_quota': number
   'checkin_setting.max_quota': number

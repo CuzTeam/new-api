@@ -2,6 +2,11 @@ import { useNavigate } from '@tanstack/react-router'
 import i18n from 'i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import { getSelf } from '@/lib/api'
+import {
+  getFrontendThemeSettingsPath,
+  normalizeFrontendTheme,
+  setFrontendTheme,
+} from '@/lib/frontend-theme'
 import type { User } from '@/features/users/types'
 import { saveUserId } from '../lib/storage'
 
@@ -18,6 +23,26 @@ function getSavedLanguage(user: User): string | undefined {
   try {
     const setting = JSON.parse(userData.setting) as { language?: unknown }
     return typeof setting.language === 'string' ? setting.language : undefined
+  } catch {
+    return undefined
+  }
+}
+
+function getSavedFrontendTheme(user: User): 'default' | 'classic' | undefined {
+  const userData = user as Record<string, unknown>
+  if (typeof userData.frontend_theme === 'string') {
+    return normalizeFrontendTheme(userData.frontend_theme)
+  }
+
+  if (typeof userData.setting !== 'string') {
+    return undefined
+  }
+
+  try {
+    const setting = JSON.parse(userData.setting) as { frontend_theme?: unknown }
+    return typeof setting.frontend_theme === 'string'
+      ? normalizeFrontendTheme(setting.frontend_theme)
+      : undefined
   } catch {
     return undefined
   }
@@ -60,6 +85,15 @@ export function useAuthRedirect() {
         const savedLang = getSavedLanguage(user)
         if (savedLang && savedLang !== i18n.language) {
           i18n.changeLanguage(savedLang)
+        }
+
+        const savedTheme = getSavedFrontendTheme(user)
+        if (savedTheme) {
+          setFrontendTheme(savedTheme)
+          if (!redirectTo) {
+            window.location.assign(getFrontendThemeSettingsPath(savedTheme))
+            return
+          }
         }
       }
     } catch (error) {

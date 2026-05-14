@@ -113,8 +113,6 @@ const GENERAL_SECTIONS = [
           DemoSiteEnabled: settings.DemoSiteEnabled,
           SelfUseModeEnabled: settings.SelfUseModeEnabled,
           AutoAcceptUnpricedModel: settings.AutoAcceptUnpricedModel,
-          'channel_selection_setting.enabled':
-            settings['channel_selection_setting.enabled'],
         }}
       />
     ),
