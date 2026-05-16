@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fumadocs Hero Replica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scrollbar-width: none; }
+html::-webkit-scrollbar { display: none; }
+:root {
+  --brand: hsl(26, 73%, 51%);
+  --brand-fg: white;
+  --border: hsla(0, 0%, 80%, 50%);
+  --bg: hsl(0, 0%, 96%);
+  --fg: #59592a;
+  --secondary-bg: hsl(0, 0%, 93%);
+  --secondary-fg: hsl(0, 0%, 9%);
+}
+.dark {
+  --brand: #fff383;
+  --brand-fg: black;
+  --border: hsla(0, 0%, 40%, 20%);
+  --bg: hsl(0, 0%, 7%);
+  --fg: #e4e2d0;
+  --secondary-bg: hsl(0, 0%, 13%);
+  --secondary-fg: hsl(0, 0%, 92%);
+}
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  margin: 0;
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+.hero {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+}
+#grain-canvas, #dither-canvas {
+  position: absolute;
+  opacity: 0;
+  animation: fadeIn 800ms ease forwards 400ms;
+}
+#grain-canvas { inset: 0; width: 100%; height: 100%; }
+#dither-canvas {
+  bottom: 15%; right: 5%; width: 80vh; height: 80vh;
+  max-width: 900px; max-height: 900px;
+  pointer-events: none;
+  animation-duration: 400ms;
+}
+.hero-content {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column;
+  justify-content: center;
+  padding: 48px 64px; width: 100%; height: 100%;
+}
+.badge {
+  font-size: 12px; color: var(--brand); font-weight: 500;
+  border-radius: 9999px; padding: 8px 12px;
+  border: 1px solid color-mix(in srgb, var(--brand) 50%, transparent);
+  width: fit-content;
+}
+h1 {
+  font-size: clamp(2.25rem, 4.5vw, 3rem);
+  font-weight: 500; line-height: 1.1;
+  letter-spacing: -0.025em; margin: 32px 0;
+}
+h1 .accent { color: var(--brand); }
+.buttons { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; width: fit-content; }
+.btn {
+  display: inline-flex; justify-content: center;
+  padding: 12px 20px; border-radius: 9999px;
+  font-weight: 500; font-size: 14px; text-decoration: none;
+  letter-spacing: -0.01em; transition: opacity 0.2s; border: none;
+}
+.btn-primary { background: var(--brand); color: var(--brand-fg); }
+.btn-primary:hover { opacity: 0.85; }
+.btn-secondary { background: var(--secondary-bg); color: var(--secondary-fg); border: 1px solid var(--border); }
+.btn-secondary:hover { opacity: 0.8; }
+.theme-toggle {
+  position: fixed; top: 24px; right: 24px; z-index: 100;
+  background: var(--secondary-bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 12px; cursor: pointer;
+  font-size: 14px; color: var(--fg); font-family: inherit;
+}
+.hero-image {
+  position: absolute; bottom: -8%; right: -5%;
+  max-width: 1200px; width: 55%; aspect-ratio: 16/9;
+  border-radius: 12px; border: 2px solid var(--border);
+  object-fit: cover;
+  opacity: 0; animation: fadeIn 400ms ease forwards 600ms;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@media (min-width: 1280px) { h1 { font-size: 3.5rem; margin-bottom: 48px; } }
+@media (max-width: 768px) {
+  .hero-content { padding: 24px; align-items: center; text-align: center; }
+  .buttons { justify-content: center; }
+  #dither-canvas { top: auto; bottom: -30%; right: -20%; width: 70vw; height: 70vw; }
+}
+@media (min-width: 769px) { h1 .mobile-br { display: none; } }
+.footer {
+  padding: 48px 32px;
+  text-align: center; font-size: 12px;
+  color: var(--fg); opacity: 0.6;
+  background: var(--bg);
+}
+</style>
+</head>
+<body>
+<div class="hero">
+  <canvas id="grain-canvas"></canvas>
+  <canvas id="dither-canvas"></canvas>
+  <div class="hero-content">
+    <p class="badge">the api platform, developers love.</p>
+    <h1><span class="accent">Empowering</span> the world with <span class="accent">free AI</span>,<br class="mobile-br"><br>no <span class="accent">limits</span>.</h1>
+    <div class="buttons">
+      <a href="https://ai.cuz-lab.space/dashboard" target="_blank" rel="noopener" class="btn btn-primary">Getting Started</a>
+      <a href="https://ai.cuz-lab.space/playground" target="_blank" rel="noopener" class="btn btn-secondary">Playground</a>
+    </div>
+  </div>
+  <img class="hero-image" id="hero-img" src="https://source.starrysky.ggff.net/ame-assets/ai-bg-white.png" alt="preview">
+</div>
+<footer class="footer">
+  <p>&copy; 2025 CUZ Lab. All rights reserved.</p>
+</footer>
+<img src="https://lmspeed.net/api/provider/claim-badge/1232?claim=1232-QAzmaDYeTo-ngVbGRR2xPBx7OE8yRuD1" style="display:none" alt="">
+
+<script>
+// =============================================
+// WebGL GrainGradient - direct GLSL port
+// =============================================
+const grainVS = `#version 300 es
+in vec2 a_position;
+out vec2 v_objectUV;
+void main() {
+  gl_Position = vec4(a_position, 0, 1);
+  v_objectUV = a_position * 0.5;
+}`;
+
+const grainFS = `#version 300 es
+precision highp float;
+
+uniform float u_time;
+uniform vec2 u_resolution;
+uniform vec4 u_colorBack;
+uniform vec4 u_colors[3];
+uniform float u_colorsCount;
+uniform float u_softness;
+uniform float u_intensity;
+uniform float u_noise;
+
+in vec2 v_objectUV;
+out vec4 fragColor;
+
+#define PI 3.14159265359
+#define TWO_PI 6.28318530718
+
+mat2 rotate(float a) { float c=cos(a),s=sin(a); return mat2(c,s,-s,c); }
+vec2 rotateV(vec2 v, float a) { return rotate(a) * v; }
+
+// Simplex noise
+vec3 permute(vec3 x) { return mod(((x * 34.0) + 1.0) * x, 289.0); }
+float snoise(vec2 v) {
+  const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+  vec2 i = floor(v + dot(v, C.yy));
+  vec2 x0 = v - i + dot(i, C.xx);
+  vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+  vec4 x12 = x0.xyxy + C.xxzz;
+  x12.xy -= i1;
+  i = mod(i, 289.0);
+  vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+  m = m*m; m = m*m;
+  vec3 x = 2.0 * fract(p * C.www) - 1.0;
+  vec3 h = abs(x) - 0.5;
+  vec3 ox = floor(x + 0.5);
+  vec3 a0 = x - ox;
+  m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+  vec3 g;
+  g.x = a0.x * x0.x + h.x * x0.y;
+  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+  return 130.0 * dot(m, g);
+}
+
+// Value noise for FBM (wrap at 100 to match texture-based tiling)
+float randomR(vec2 st) {
+  st = mod(st, 100.0);
+  return fract(sin(dot(st, vec2(127.1, 311.7))) * 43758.5453);
+}
+float valueNoiseR(vec2 st) {
+  vec2 i = floor(st);
+  vec2 f = fract(st);
+  float a = randomR(i);
+  float b = randomR(i + vec2(1.0, 0.0));
+  float c = randomR(i + vec2(0.0, 1.0));
+  float d = randomR(i + vec2(1.0, 1.0));
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+}
+float fbmR(vec2 n) {
+  float amplitude = 0.2;
+  float total = 0.0;
+  for (int i = 0; i < 3; i++) {
+    n = rotateV(n, 0.3);
+    total += valueNoiseR(n) * amplitude;
+    n *= 1.99;
+    amplitude *= 0.6;
+  }
+  return total;
+}
+
+void main() {
+  float t = 0.1 * (u_time + 7.0);
+  float objectBoxSize = min(u_resolution.x, u_resolution.y);
+  vec2 shape_uv = v_objectUV * u_resolution / objectBoxSize;
+  vec2 grain_uv = v_objectUV * u_resolution * 0.7;
+
+  // === Corners shape ===
+  shape_uv *= 0.6;
+  vec2 outer = vec2(0.5);
+  vec2 bl = smoothstep(vec2(0.0), outer, shape_uv + vec2(0.1 + 0.1*sin(3.0*t), 0.2 - 0.1*sin(5.25*t)));
+  vec2 tr = smoothstep(vec2(0.0), outer, 1.0 - shape_uv);
+  float shape = 1.0 - bl.x * bl.y * tr.x * tr.y;
+
+  shape_uv = -shape_uv;
+  bl = smoothstep(vec2(0.0), outer, shape_uv + vec2(0.1 + 0.1*sin(3.0*t), 0.2 - 0.1*cos(5.25*t)));
+  tr = smoothstep(vec2(0.0), outer, 1.0 - shape_uv);
+  shape -= bl.x * bl.y * tr.x * tr.y;
+  shape = 1.0 - smoothstep(0.0, 1.0, shape);
+
+  // === Noise distortion ===
+  float baseNoise = snoise(grain_uv * 0.5);
+  float fbmX = fbmR(0.002 * grain_uv + 10.0);
+  float fbmY = fbmR(0.003 * grain_uv);
+  float fbmZ = fbmR(0.001 * grain_uv) + fbmR(rotateV(0.4 * grain_uv, 2.0));
+  float grainDist = baseNoise * snoise(grain_uv * 0.2) - fbmX - fbmY;
+  float rawNoise = 0.75 * baseNoise - fbmZ;
+  float noiseVal = clamp(rawNoise, 0.0, 1.0);
+
+  shape += u_intensity * 2.0 / u_colorsCount * (grainDist + 0.5);
+  shape += u_noise * 10.0 / u_colorsCount * noiseVal;
+
+  // === Color mapping ===
+  float aa = fwidth(shape);
+  shape = clamp(shape - 0.5 / u_colorsCount, 0.0, 1.0);
+  float totalShape = smoothstep(0.0, u_softness + 2.0*aa, clamp(shape * u_colorsCount, 0.0, 1.0));
+  float mixer = shape * (u_colorsCount - 1.0);
+
+  vec4 gradient = u_colors[0];
+  gradient.rgb *= gradient.a;
+  for (int i = 1; i < 3; i++) {
+    float localT = clamp(mixer - float(i - 1), 0.0, 1.0);
+    localT = smoothstep(0.5 - 0.5*u_softness - aa, 0.5 + 0.5*u_softness + aa, localT);
+    vec4 c = u_colors[i];
+    c.rgb *= c.a;
+    gradient = mix(gradient, c, localT);
+  }
+
+  vec3 color = gradient.rgb * totalShape;
+  float opacity = gradient.a * totalShape;
+  color += u_colorBack.rgb * u_colorBack.a * (1.0 - opacity);
+  opacity += u_colorBack.a * (1.0 - opacity);
+  fragColor = vec4(color, opacity);
+}`;
+
+// =============================================
+// WebGL Dithering - sphere, 4x4 Bayer, static
+// =============================================
+const ditherVS = grainVS;
+const ditherFS = `#version 300 es
+precision highp float;
+
+uniform vec2 u_resolution;
+uniform vec4 u_colorFront;
+uniform vec4 u_colorBack;
+uniform float u_scale;
+uniform float u_pxSize;
+uniform float u_time;
+
+out vec4 fragColor;
+
+const int bayer4x4[16] = int[16](0,8,2,10, 12,4,14,6, 3,11,1,9, 15,7,13,5);
+
+void main() {
+  float t = 0.5 * u_time;
+  float pxSize = u_pxSize;
+  vec2 pxSizeUV = gl_FragCoord.xy / pxSize;
+  vec2 canvasPixelizedUV = (floor(pxSizeUV) + 0.5) * pxSize;
+  vec2 normalizedUV = canvasPixelizedUV / u_resolution;
+  vec2 shapeUV = normalizedUV - 0.5;
+
+  // Object box sizing (square, fit=none)
+  float objectBoxSize = min(u_resolution.x, u_resolution.y);
+  vec2 objectWorldScale = u_resolution.xy / vec2(objectBoxSize);
+  shapeUV *= objectWorldScale;
+  shapeUV /= u_scale;
+
+  // Sphere shape
+  shapeUV *= 2.0;
+  float d = 1.0 - dot(shapeUV, shapeUV);
+  vec3 pos = vec3(shapeUV, sqrt(max(0.0, d)));
+  vec3 lightPos = normalize(vec3(cos(1.5*t), 0.8, sin(1.25*t)));
+  float shape = (0.5 + 0.5 * dot(lightPos, pos)) * step(0.0, d);
+
+  // 4x4 Bayer dithering
+  ivec2 bpos = ivec2(mod(pxSizeUV, 4.0));
+  float dithering = float(bayer4x4[bpos.y * 4 + bpos.x]) / 16.0 - 0.5;
+  float res = step(0.5, shape + dithering);
+
+  vec3 fgColor = u_colorFront.rgb * u_colorFront.a;
+  float fgOpacity = u_colorFront.a;
+  vec3 bgColor = u_colorBack.rgb * u_colorBack.a;
+  float bgOpacity = u_colorBack.a;
+  vec3 color = fgColor * res + bgColor * (1.0 - fgOpacity * res);
+  float opacity = fgOpacity * res + bgOpacity * (1.0 - fgOpacity * res);
+  fragColor = vec4(color, opacity);
+}`;
+
+// =============================================
+// WebGL helpers
+// =============================================
+function createShader(gl, type, src) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src);
+  gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+    console.error(gl.getShaderInfoLog(s));
+    gl.deleteShader(s);
+    return null;
+  }
+  return s;
+}
+function createProgram(gl, vs, fs) {
+  const p = gl.createProgram();
+  gl.attachShader(p, vs);
+  gl.attachShader(p, fs);
+  gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+    console.error(gl.getProgramInfoLog(p));
+    return null;
+  }
+  return p;
+}
+function initGL(canvas, vsSrc, fsSrc) {
+  const gl = canvas.getContext('webgl2', { alpha: true, premultipliedAlpha: false });
+  if (!gl) return null;
+  const vs = createShader(gl, gl.VERTEX_SHADER, vsSrc);
+  const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSrc);
+  if (!vs || !fs) return null;
+  const prog = createProgram(gl, vs, fs);
+  if (!prog) return null;
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  gl.useProgram(prog);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  return { gl, prog };
+}
+function hexToVec4(hex) {
+  hex = hex.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16) / 255;
+  const g = parseInt(hex.substring(2, 4), 16) / 255;
+  const b = parseInt(hex.substring(4, 6), 16) / 255;
+  const a = hex.length >= 8 ? parseInt(hex.substring(6, 8), 16) / 255 : 1;
+  return [r, g, b, a];
+}
+
+// =============================================
+// Init GrainGradient
+// =============================================
+const grainCanvas = document.getElementById('grain-canvas');
+const grainGL = initGL(grainCanvas, grainVS, grainFS);
+let grainTime = 0;
+
+function resizeGrain() {
+  const rect = grainCanvas.parentElement.getBoundingClientRect();
+  const maxPixelCount = 1920 * 1080;
+  let dpr = Math.min(window.devicePixelRatio, 2);
+  if (rect.width * rect.height * dpr * dpr > maxPixelCount) {
+    dpr = Math.sqrt(maxPixelCount / (rect.width * rect.height));
+  }
+  dpr = Math.max(dpr, 1);
+  grainCanvas.width = Math.round(rect.width * dpr);
+  grainCanvas.height = Math.round(rect.height * dpr);
+  grainGL.gl.viewport(0, 0, grainCanvas.width, grainCanvas.height);
+}
+
+function drawGrain() {
+  const { gl, prog } = grainGL;
+  const dark = document.documentElement.classList.contains('dark');
+  const colors = dark
+    ? ['#39BE1CFF', '#9c2f05FF', '#7A2A0000']
+    : ['#fcfc51FF', '#ffa057FF', '#7A2A0020'];
+
+  gl.clearColor(0, 0, 0, 0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.uniform1f(gl.getUniformLocation(prog, 'u_time'), grainTime / 1000.0);
+  gl.uniform2f(gl.getUniformLocation(prog, 'u_resolution'), grainCanvas.width, grainCanvas.height);
+  gl.uniform4fv(gl.getUniformLocation(prog, 'u_colorBack'), hexToVec4('#00000000'));
+  for (let i = 0; i < 3; i++) {
+    gl.uniform4fv(gl.getUniformLocation(prog, `u_colors[${i}]`), hexToVec4(colors[i]));
+  }
+  gl.uniform1f(gl.getUniformLocation(prog, 'u_colorsCount'), 3);
+  gl.uniform1f(gl.getUniformLocation(prog, 'u_softness'), 1.0);
+  gl.uniform1f(gl.getUniformLocation(prog, 'u_intensity'), 0.9);
+  gl.uniform1f(gl.getUniformLocation(prog, 'u_noise'), 0.5);
+
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  grainTime++;
+  requestAnimationFrame(drawGrain);
+}
+
+// =============================================
+// Init Dithering
+// =============================================
+const ditherCanvas = document.getElementById('dither-canvas');
+const ditherGL = initGL(ditherCanvas, ditherVS, ditherFS);
+
+function drawDither() {
+  const dpr = Math.min(window.devicePixelRatio, 2);
+  const rect = ditherCanvas.getBoundingClientRect();
+  ditherCanvas.width = Math.round(rect.width * dpr);
+  ditherCanvas.height = Math.round(rect.height * dpr);
+  const { gl, prog } = ditherGL;
+  gl.viewport(0, 0, ditherCanvas.width, ditherCanvas.height);
+
+  gl.clearColor(0, 0, 0, 0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  const dark = document.documentElement.classList.contains('dark');
+  const frontColor = dark ? '#DF3F00FF' : '#fa8023FF';
+
+  gl.uniform2f(gl.getUniformLocation(prog, 'u_resolution'), ditherCanvas.width, ditherCanvas.height);
+  gl.uniform4fv(gl.getUniformLocation(prog, 'u_colorFront'), hexToVec4(frontColor));
+  gl.uniform4fv(gl.getUniformLocation(prog, 'u_colorBack'), hexToVec4('#00000000'));
+  gl.uniform1f(gl.getUniformLocation(prog, 'u_scale'), 0.5);
+  gl.uniform1f(gl.getUniformLocation(prog, 'u_pxSize'), 3.0 * dpr);
+  gl.uniform1f(gl.getUniformLocation(prog, 'u_time'), 600.0);
+
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+}
+
+// =============================================
+// Boot
+// =============================================
+function updateHeroImg() {
+  const dark = document.documentElement.classList.contains('dark');
+  document.getElementById('hero-img').src = dark
+    ? 'https://source.starrysky.ggff.net/ame-assets/ai-bg.png'
+    : 'https://source.starrysky.ggff.net/ame-assets/ai-bg-white.png';
+}
+
+if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  document.documentElement.classList.add('dark');
+}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+  document.documentElement.classList.toggle('dark', e.matches);
+  updateHeroImg();
+  drawDither();
+});
+
+function init() {
+  if (!grainGL || !ditherGL) {
+    document.querySelector('.hero').style.background = 'var(--bg)';
+    return;
+  }
+  resizeGrain();
+  drawGrain();
+  drawDither();
+  updateHeroImg();
+  const obs = new MutationObserver(() => { drawDither(); updateHeroImg(); });
+  obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+}
+window.addEventListener('resize', () => { resizeGrain(); drawDither(); });
+setTimeout(init, 400);
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9fca8698aee05783',t:'MTc3ODkzNjAxMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
