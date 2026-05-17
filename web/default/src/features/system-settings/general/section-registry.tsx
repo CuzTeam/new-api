@@ -54,6 +54,7 @@ const GENERAL_SECTIONS = [
           PreConsumedQuota: settings.PreConsumedQuota,
           QuotaForInviter: settings.QuotaForInviter,
           QuotaForInvitee: settings.QuotaForInvitee,
+          InitialSubscriptionPlanId: settings.InitialSubscriptionPlanId,
           TopUpLink: settings.TopUpLink,
           'general_setting.docs_link': settings['general_setting.docs_link'],
           'quota_setting.enable_free_model_pre_consume':

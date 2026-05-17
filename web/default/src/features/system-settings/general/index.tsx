@@ -33,6 +33,7 @@ const defaultGeneralSettings: GeneralSettings = {
   PreConsumedQuota: 0,
   QuotaForInviter: 0,
   QuotaForInvitee: 0,
+  InitialSubscriptionPlanId: 0,
   TopUpLink: '',
   'general_setting.docs_link': '',
   'quota_setting.enable_free_model_pre_consume': true,

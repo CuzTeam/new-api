@@ -433,6 +433,7 @@ func (user *User) Insert(inviterId int) error {
 			_ = inviteUser(inviterId)
 		}
 	}
+	BindInitialSubscription(user.Id)
 	return nil
 }
 
@@ -496,6 +497,7 @@ func (user *User) FinalizeOAuthUserCreation(inviterId int) {
 			_ = inviteUser(inviterId)
 		}
 	}
+	BindInitialSubscription(user.Id)
 }
 
 func (user *User) Update(updatePassword bool) error {

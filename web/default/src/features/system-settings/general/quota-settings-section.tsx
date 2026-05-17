@@ -2,6 +2,7 @@ import * as z from 'zod'
 import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
+import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -14,17 +15,26 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { FormDirtyIndicator } from '../components/form-dirty-indicator'
 import { FormNavigationGuard } from '../components/form-navigation-guard'
 import { SettingsSection } from '../components/settings-section'
 import { useSettingsForm } from '../hooks/use-settings-form'
 import { useUpdateOption } from '../hooks/use-update-option'
+import { getAdminPlans } from '@/features/subscriptions/api'
 
 const quotaSchema = z.object({
   QuotaForNewUser: z.coerce.number().min(0),
   PreConsumedQuota: z.coerce.number().min(0),
   QuotaForInviter: z.coerce.number().min(0),
   QuotaForInvitee: z.coerce.number().min(0),
+  InitialSubscriptionPlanId: z.coerce.number().min(0),
   TopUpLink: z.string().url().optional().or(z.literal('')),
   'general_setting.docs_link': z.string().url().optional().or(z.literal('')),
   'quota_setting.enable_free_model_pre_consume': z.boolean(),
@@ -41,6 +51,15 @@ export function QuotaSettingsSection({
 }: QuotaSettingsSectionProps) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
+
+  const { data: plansData } = useQuery({
+    queryKey: ['admin-subscription-plans'],
+    queryFn: async () => {
+      const result = await getAdminPlans()
+      return result.data || []
+    },
+  })
+  const plans = plansData || []
 
   const { form, handleSubmit, isDirty, isSubmitting } =
     useSettingsForm<QuotaFormValues>({
@@ -160,6 +179,44 @@ export function QuotaSettingsSection({
                 </FormControl>
                 <FormDescription>
                   {t('Quota given to invited users')}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='InitialSubscriptionPlanId'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('Initial Subscription Plan')}</FormLabel>
+                <FormControl>
+                  <Select
+                    value={String(field.value)}
+                    onValueChange={(val) => field.onChange(Number(val))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('None')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value='0'>{t('None')}</SelectItem>
+                      {plans.map((item) => (
+                        <SelectItem
+                          key={item.plan.id}
+                          value={String(item.plan.id)}
+                        >
+                          {item.plan.title}
+                          {!item.plan.enabled && ` (${t('Disabled')})`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormDescription>
+                  {t(
+                    'Automatically bind this subscription plan to new users upon registration'
+                  )}
                 </FormDescription>
                 <FormMessage />
               </FormItem>

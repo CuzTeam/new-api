@@ -445,7 +445,7 @@ func CreateUserSubscriptionFromPlanTx(tx *gorm.DB, userId int, plan *Subscriptio
 	if userId <= 0 {
 		return nil, errors.New("invalid user id")
 	}
-	if plan.MaxPurchasePerUser > 0 {
+	if plan.MaxPurchasePerUser > 0 && source != "initial" {
 		var count int64
 		if err := tx.Model(&UserSubscription{}).
 			Where("user_id = ? AND plan_id = ?", userId, plan.Id).
@@ -664,7 +664,35 @@ func AdminBindSubscription(userId int, planId int, sourceNote string) (string, e
 	return "", nil
 }
 
-// GetAllActiveUserSubscriptions returns all active subscriptions for a user.
+// BindInitialSubscription binds the configured initial subscription plan to a new user.
+// Skips silently if planId is 0, plan doesn't exist, or plan is disabled.
+func BindInitialSubscription(userId int) {
+	planId := common.InitialSubscriptionPlanId
+	if planId <= 0 {
+		return
+	}
+	plan, err := GetSubscriptionPlanById(planId)
+	if err != nil {
+		common.SysLog(fmt.Sprintf("初始套餐绑定失败: 套餐 %d 不存在, 用户 %d, err: %v", planId, userId, err))
+		return
+	}
+	if !plan.Enabled {
+		common.SysLog(fmt.Sprintf("初始套餐绑定跳过: 套餐 %d 已禁用, 用户 %d", planId, userId))
+		return
+	}
+	err = DB.Transaction(func(tx *gorm.DB) error {
+		_, err := CreateUserSubscriptionFromPlanTx(tx, userId, plan, "initial")
+		return err
+	})
+	if err != nil {
+		common.SysLog(fmt.Sprintf("初始套餐绑定失败: 用户 %d, 套餐 %d, err: %v", userId, planId, err))
+		return
+	}
+	if strings.TrimSpace(plan.UpgradeGroup) != "" {
+		_ = UpdateUserGroupCache(userId, plan.UpgradeGroup)
+	}
+	RecordLog(userId, LogTypeSystem, fmt.Sprintf("新用户注册自动绑定初始套餐: %s", plan.Title))
+}
 func GetAllActiveUserSubscriptions(userId int) ([]SubscriptionSummary, error) {
 	if userId <= 0 {
 		return nil, errors.New("invalid userId")
