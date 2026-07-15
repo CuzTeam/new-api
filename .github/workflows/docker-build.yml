@@ -3,12 +3,12 @@ name: Publish Docker image (Multi-arch)
 on:
   push:
     tags:
-      - '*'
-      - '!nightly*'
+      - "*"
+      - "!nightly*"
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag name to build (e.g., v0.10.8-alpha.3)'
+        description: "Tag name to build (e.g., v0.10.8-alpha.3)"
         required: true
         type: string
 
@@ -28,6 +28,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     outputs:
       tag: ${{ steps.version.outputs.tag }}
+      ghcr_image: ${{ steps.version.outputs.ghcr_image }}
 
     permissions:
       packages: write
@@ -53,8 +54,11 @@ jobs:
           else
             TAG=${GITHUB_REF#refs/tags/}
           fi
+          GHCR_IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
           echo "TAG=${TAG}" >> $GITHUB_ENV
+          echo "GHCR_IMAGE=${GHCR_IMAGE}" >> $GITHUB_ENV
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "ghcr_image=${GHCR_IMAGE}" >> $GITHUB_OUTPUT
           echo "${TAG}" > VERSION
           echo "Building tag: ${TAG} for ${{ matrix.arch }}"
 
@@ -67,11 +71,20 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Log in to GHCR
+        uses: docker/login-action@c99871dec2022cc055c062a10cc1a1310835ceb4 # v4.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Extract metadata (labels)
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
-          images: calciumion/new-api
+          images: |
+            calciumion/new-api
+            ${{ env.GHCR_IMAGE }}
 
       - name: Build & push
         id: build
@@ -83,6 +96,8 @@ jobs:
           tags: |
             calciumion/new-api:${{ env.TAG }}-${{ matrix.arch }}
             calciumion/new-api:latest-${{ matrix.arch }}
+            ${{ env.GHCR_IMAGE }}:${{ env.TAG }}-${{ matrix.arch }}
+            ${{ env.GHCR_IMAGE }}:latest-${{ matrix.arch }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -93,13 +108,16 @@ jobs:
         uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
 
       - name: Sign image with cosign
-        run: cosign sign --yes calciumion/new-api@${{ steps.build.outputs.digest }}
+        run: |
+          cosign sign --yes calciumion/new-api@${{ steps.build.outputs.digest }}
+          cosign sign --yes ${GHCR_IMAGE}@${{ steps.build.outputs.digest }}
 
       - name: Image summary
         run: |
           echo "### Docker Image Digest (${{ matrix.arch }})" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "calciumion/new-api:${TAG}-${{ matrix.arch }}" >> $GITHUB_STEP_SUMMARY
+          echo "${GHCR_IMAGE}:${TAG}-${{ matrix.arch }}" >> $GITHUB_STEP_SUMMARY
           echo "${{ steps.build.outputs.digest }}" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
@@ -110,17 +128,28 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
 
     permissions:
+      packages: write
+      contents: read
       id-token: write
 
     steps:
       - name: Set version
-        run: echo "TAG=${{ needs.build_single_arch.outputs.tag }}" >> $GITHUB_ENV
+        run: |
+          echo "TAG=${{ needs.build_single_arch.outputs.tag }}" >> $GITHUB_ENV
+          echo "GHCR_IMAGE=${{ needs.build_single_arch.outputs.ghcr_image }}" >> $GITHUB_ENV
 
       - name: Log in to Docker Hub
         uses: docker/login-action@c99871dec2022cc055c062a10cc1a1310835ceb4 # v4.3.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Log in to GHCR
+        uses: docker/login-action@c99871dec2022cc055c062a10cc1a1310835ceb4 # v4.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create & push manifest (version)
         run: |
@@ -136,17 +165,35 @@ jobs:
             calciumion/new-api:latest-amd64 \
             calciumion/new-api:latest-arm64
 
+      - name: Create & push GHCR manifest (version)
+        run: |
+          docker buildx imagetools create \
+            -t ${GHCR_IMAGE}:${TAG} \
+            ${GHCR_IMAGE}:${TAG}-amd64 \
+            ${GHCR_IMAGE}:${TAG}-arm64
+
+      - name: Create & push GHCR manifest (latest)
+        run: |
+          docker buildx imagetools create \
+            -t ${GHCR_IMAGE}:latest \
+            ${GHCR_IMAGE}:latest-amd64 \
+            ${GHCR_IMAGE}:latest-arm64
+
       - name: Install cosign
-        uses: sigstore/cosign-installer@v3
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
 
       - name: Sign manifests with cosign
         run: |
           cosign sign --yes calciumion/new-api:${TAG}
           cosign sign --yes calciumion/new-api:latest
+          cosign sign --yes ${GHCR_IMAGE}:${TAG}
+          cosign sign --yes ${GHCR_IMAGE}:latest
 
       - name: Manifest summary
         run: |
           echo "### Multi-arch Manifest" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           docker buildx imagetools inspect calciumion/new-api:${TAG} >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          docker buildx imagetools inspect ${GHCR_IMAGE}:${TAG} >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY

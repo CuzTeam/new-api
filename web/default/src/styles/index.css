@@ -55,6 +55,10 @@ For commercial licensing, please contact support@quantumnous.com
   }
   html {
     @apply overflow-x-hidden font-sans;
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
   }
   body {
     @apply bg-background text-foreground has-[div[data-variant='inset']]:bg-sidebar min-h-svh w-full;
@@ -249,7 +253,7 @@ For commercial licensing, please contact support@quantumnous.com
   }
 
   .glass-3 {
-    @apply border-border from-card/30 to-card/20 dark:border-border/10 dark:border-t-border/20 dark:border-b-border/5 dark:from-primary/5 dark:to-primary/2 border bg-linear-to-b;
+    @apply border-border from-card to-muted border bg-linear-to-b;
   }
 
   .glass-4 {
