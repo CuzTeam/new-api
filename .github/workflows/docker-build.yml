@@ -1,4 +1,4 @@
-name: Publish Docker image (Multi-arch)
+name: Publish container images (Multi-arch)
 
 on:
   push:
@@ -15,6 +15,8 @@ on:
 jobs:
   build_single_arch:
     name: Build & push (${{ matrix.arch }})
+    env:
+      DOCKERHUB_ENABLED: ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
     strategy:
       fail-fast: false
       matrix:
@@ -66,6 +68,7 @@ jobs:
         uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
 
       - name: Log in to Docker Hub
+        if: ${{ env.DOCKERHUB_ENABLED == 'true' }}
         uses: docker/login-action@c99871dec2022cc055c062a10cc1a1310835ceb4 # v4.3.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -78,13 +81,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Prepare image tags
+        id: image_tags
+        run: |
+          {
+            echo 'tags<<EOF'
+            echo "${GHCR_IMAGE}:${TAG}-${{ matrix.arch }}"
+            echo "${GHCR_IMAGE}:latest-${{ matrix.arch }}"
+            if [ "${DOCKERHUB_ENABLED}" = "true" ]; then
+              echo "calciumion/new-api:${TAG}-${{ matrix.arch }}"
+              echo "calciumion/new-api:latest-${{ matrix.arch }}"
+            fi
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
       - name: Extract metadata (labels)
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
-          images: |
-            calciumion/new-api
-            ${{ env.GHCR_IMAGE }}
+          images: ${{ env.GHCR_IMAGE }}
 
       - name: Build & push
         id: build
@@ -93,11 +108,7 @@ jobs:
           context: .
           platforms: ${{ matrix.platform }}
           push: true
-          tags: |
-            calciumion/new-api:${{ env.TAG }}-${{ matrix.arch }}
-            calciumion/new-api:latest-${{ matrix.arch }}
-            ${{ env.GHCR_IMAGE }}:${{ env.TAG }}-${{ matrix.arch }}
-            ${{ env.GHCR_IMAGE }}:latest-${{ matrix.arch }}
+          tags: ${{ steps.image_tags.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -107,17 +118,21 @@ jobs:
       - name: Install cosign
         uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
 
-      - name: Sign image with cosign
-        run: |
-          cosign sign --yes calciumion/new-api@${{ steps.build.outputs.digest }}
-          cosign sign --yes ${GHCR_IMAGE}@${{ steps.build.outputs.digest }}
+      - name: Sign GHCR image with cosign
+        run: cosign sign --yes ${GHCR_IMAGE}@${{ steps.build.outputs.digest }}
+
+      - name: Sign Docker Hub image with cosign
+        if: ${{ env.DOCKERHUB_ENABLED == 'true' }}
+        run: cosign sign --yes calciumion/new-api@${{ steps.build.outputs.digest }}
 
       - name: Image summary
         run: |
           echo "### Docker Image Digest (${{ matrix.arch }})" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "calciumion/new-api:${TAG}-${{ matrix.arch }}" >> $GITHUB_STEP_SUMMARY
           echo "${GHCR_IMAGE}:${TAG}-${{ matrix.arch }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${DOCKERHUB_ENABLED}" = "true" ]; then
+            echo "calciumion/new-api:${TAG}-${{ matrix.arch }}" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "${{ steps.build.outputs.digest }}" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
@@ -126,6 +141,8 @@ jobs:
     needs: [build_single_arch]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    env:
+      DOCKERHUB_ENABLED: ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
 
     permissions:
       packages: write
@@ -139,6 +156,7 @@ jobs:
           echo "GHCR_IMAGE=${{ needs.build_single_arch.outputs.ghcr_image }}" >> $GITHUB_ENV
 
       - name: Log in to Docker Hub
+        if: ${{ env.DOCKERHUB_ENABLED == 'true' }}
         uses: docker/login-action@c99871dec2022cc055c062a10cc1a1310835ceb4 # v4.3.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -152,6 +170,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create & push manifest (version)
+        if: ${{ env.DOCKERHUB_ENABLED == 'true' }}
         run: |
           docker buildx imagetools create \
             -t calciumion/new-api:${TAG} \
@@ -159,6 +178,7 @@ jobs:
             calciumion/new-api:${TAG}-arm64
 
       - name: Create & push manifest (latest)
+        if: ${{ env.DOCKERHUB_ENABLED == 'true' }}
         run: |
           docker buildx imagetools create \
             -t calciumion/new-api:latest \
@@ -182,18 +202,24 @@ jobs:
       - name: Install cosign
         uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
 
-      - name: Sign manifests with cosign
+      - name: Sign GHCR manifests with cosign
+        run: |
+          cosign sign --yes ${GHCR_IMAGE}:${TAG}
+          cosign sign --yes ${GHCR_IMAGE}:latest
+
+      - name: Sign Docker Hub manifests with cosign
+        if: ${{ env.DOCKERHUB_ENABLED == 'true' }}
         run: |
           cosign sign --yes calciumion/new-api:${TAG}
           cosign sign --yes calciumion/new-api:latest
-          cosign sign --yes ${GHCR_IMAGE}:${TAG}
-          cosign sign --yes ${GHCR_IMAGE}:latest
 
       - name: Manifest summary
         run: |
           echo "### Multi-arch Manifest" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          docker buildx imagetools inspect calciumion/new-api:${TAG} >> $GITHUB_STEP_SUMMARY
-          echo '' >> $GITHUB_STEP_SUMMARY
           docker buildx imagetools inspect ${GHCR_IMAGE}:${TAG} >> $GITHUB_STEP_SUMMARY
+          if [ "${DOCKERHUB_ENABLED}" = "true" ]; then
+            echo '' >> $GITHUB_STEP_SUMMARY
+            docker buildx imagetools inspect calciumion/new-api:${TAG} >> $GITHUB_STEP_SUMMARY
+          fi
           echo '```' >> $GITHUB_STEP_SUMMARY
