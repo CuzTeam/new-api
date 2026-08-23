@@ -179,22 +179,26 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 .dark {
-  /* OpenAI-like dark mode with a crisp charcoal canvas. */
-  --background: oklch(0.235 0 0);
+  /* True-black dark canvas with lifted neutral surfaces. Text pairs are
+   * tuned to WCAG 2 AA: foreground text >= 4.5:1 on every surface, and the
+   * dual-role accents (primary / sidebar-primary / destructive) sit in the
+   * luminance window that keeps white button text >= 4.5:1 while also
+   * staying >= 4.5:1 as colored text on the black canvas. */
+  --background: oklch(0 0 0);
   --foreground: oklch(0.965 0 0);
-  --card: oklch(0.285 0 0);
+  --card: oklch(0.16 0 0);
   --card-foreground: oklch(0.965 0 0);
-  --popover: oklch(0.305 0 0);
+  --popover: oklch(0.18 0 0);
   --popover-foreground: oklch(0.965 0 0);
-  --primary: oklch(0.54 0.142 248.516);
+  --primary: oklch(0.565 0.15 248.516);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.335 0 0);
+  --secondary: oklch(0.2 0 0);
   --secondary-foreground: oklch(0.9 0.05 250);
-  --muted: oklch(0.305 0 0);
+  --muted: oklch(0.18 0 0);
   --muted-foreground: oklch(0.78 0 0);
   --accent: color-mix(in oklch, var(--primary) 20%, var(--background));
   --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: oklch(0.58 0.191 22.216);
   --destructive-foreground: oklch(0.985 0 0);
   --success: oklch(0.696 0.17 162.48);
   --success-foreground: oklch(0.145 0 0);
@@ -204,24 +208,26 @@ For commercial licensing, please contact support@quantumnous.com
   --info-foreground: oklch(0.145 0 0);
   --neutral: oklch(0.76 0 0);
   --neutral-foreground: oklch(0.155 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 17%);
+  /* Input boundaries meet WCAG SC 1.4.11 (3:1) on background/card/popover;
+   * hairline --border stays decorative. */
+  --border: oklch(1 0 0 / 16%);
+  --input: oklch(1 0 0 / 38%);
   --ring: oklch(0.554 0.148 250.726);
   --chart-1: oklch(0.76 0.14 250);
   --chart-2: oklch(0.76 0.13 200);
   --chart-3: oklch(0.76 0.13 285);
   --chart-4: oklch(0.75 0.16 325);
   --chart-5: oklch(0.76 0.14 155);
-  --sidebar: oklch(0.225 0 0);
+  --sidebar: oklch(0 0 0);
   --sidebar-foreground: oklch(0.95 0 0);
-  --sidebar-primary: oklch(0.588 0.123 246.488);
+  --sidebar-primary: oklch(0.565 0.13 246.488);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: color-mix(in oklch, var(--primary) 20%, var(--background));
   --sidebar-accent-foreground: oklch(0.9 0.05 250);
-  --sidebar-border: oklch(1 0 0 / 11%);
+  --sidebar-border: oklch(1 0 0 / 16%);
   --sidebar-ring: oklch(0.7 0.17 250);
-  --skeleton-base: oklch(0.335 0 0);
-  --skeleton-highlight: oklch(0.44 0 0);
+  --skeleton-base: oklch(0.2 0 0);
+  --skeleton-highlight: oklch(0.3 0 0);
   --table-row: var(--background);
   --table-header: color-mix(in oklch, var(--foreground) 6%, var(--background));
   --table-header-hover: color-mix(
