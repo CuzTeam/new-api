@@ -19,7 +19,6 @@ For commercial licensing, please contact support@quantumnous.com
 import { api } from '@/lib/api'
 
 import type {
-  ConfirmPaymentComplianceResponse,
   FetchUpstreamRatiosRequest,
   LogCleanupTask,
   SystemOptionsResponse,
@@ -38,14 +37,6 @@ export async function getSystemOptions() {
 
 export async function updateSystemOption(request: UpdateOptionRequest) {
   const res = await api.put<UpdateOptionResponse>('/api/option/', request)
-  return res.data
-}
-
-export async function confirmPaymentCompliance() {
-  const res = await api.post<ConfirmPaymentComplianceResponse>(
-    '/api/option/payment_compliance',
-    { confirmed: true }
-  )
   return res.data
 }
 
