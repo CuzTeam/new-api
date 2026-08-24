@@ -24,8 +24,14 @@ export const STATIC_I18N_KEYS = [
   'Console',
   'Model Square',
   'Rankings',
+  'Benchmarks',
   'Docs',
   'About',
+
+  // Benchmark categories (labels arrive from the benchmark API)
+  'Agents & tools',
+  'Reasoning',
+  'Search',
 
   // Sidebar views (drill-in workspaces)
   'System Settings',

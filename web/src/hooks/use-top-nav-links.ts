@@ -86,6 +86,12 @@ export function useTopNavLinks(): TopNavLink[] {
     links.push({ title: t('Rankings'), href: '/rankings', requiresAuth })
   }
 
+  // Benchmarks (public by default; set "benchmarks": false in
+  // HeaderNavModules to hide)
+  if (modules?.benchmarks !== false) {
+    links.push({ title: t('Benchmarks'), href: '/benchmarks' })
+  }
+
   // Docs (supports external links)
   if (modules?.docs !== false) {
     if (docsLink) {
