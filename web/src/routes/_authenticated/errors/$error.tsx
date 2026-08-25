@@ -18,7 +18,6 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute } from '@tanstack/react-router'
 
-import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
@@ -51,7 +50,6 @@ function RouteComponent() {
         <Search />
         <div className='ms-auto flex items-center md:space-x-4'>
           <ThemeSwitch />
-          <ConfigDrawer />
           <ProfileDropdown />
         </div>
       </Header>
