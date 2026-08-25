@@ -101,18 +101,16 @@ export function Hero(props: HeroProps) {
                 href={docsUrl}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='text-muted-foreground hover:text-foreground inline-flex h-11 items-center gap-1 text-sm font-medium transition-colors'
+                className='ring-border hover:bg-muted/60 inline-flex h-11 items-center gap-1 rounded-full px-6 text-sm font-semibold ring-1 transition-colors'
               >
                 {t('Docs')}
-                <ArrowRight className='size-3.5' />
               </a>
             ) : (
               <Link
                 to={docsUrl}
-                className='text-muted-foreground hover:text-foreground inline-flex h-11 items-center gap-1 text-sm font-medium transition-colors'
+                className='ring-border hover:bg-muted/60 inline-flex h-11 items-center gap-1 rounded-full px-6 text-sm font-semibold ring-1 transition-colors'
               >
                 {t('Docs')}
-                <ArrowRight className='size-3.5' />
               </Link>
             )}
           </div>
