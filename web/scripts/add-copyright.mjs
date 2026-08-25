@@ -67,8 +67,10 @@ For commercial licensing, please contact support@quantumnous.com
 */
 `
 
+const MODIFICATIONS_LINE_PATTERN = /^Modifications Copyright \(C\) .+$/
+
 const PROJECT_COPYRIGHT_BLOCK_PATTERN =
-  /^\/\*\r?\nCopyright \(C\) .+? QuantumNous\r?\n[\s\S]*?For commercial licensing, please contact support@quantumnous\.com\r?\n\*\/\r?\n?/
+  /^\/\*\r?\nCopyright \(C\) .+? QuantumNous(?:\r?\nModifications Copyright \(C\) .+)*\r?\n[\s\S]*?For commercial licensing, please contact support@quantumnous\.com\r?\n\*\/\r?\n?/
 const THIRD_PARTY_COPYRIGHT_PATTERN =
   /^\/\*[\s\S]*?Copyright[\s\S]*?\*\/\r?\n?/i
 
@@ -151,9 +153,17 @@ function splitShebang(text) {
 
 function applyHeader(text) {
   const newline = text.includes('\r\n') ? '\r\n' : '\n'
-  const header = COPYRIGHT_HEADER.replaceAll('\n', newline)
+  let header = COPYRIGHT_HEADER.replaceAll('\n', newline)
   const [shebang, body] = splitShebang(text)
   const hadHeader = PROJECT_COPYRIGHT_BLOCK_PATTERN.test(body)
+  const modifications =
+    body.match(new RegExp(MODIFICATIONS_LINE_PATTERN.source, 'gm')) ?? []
+  if (modifications.length > 0) {
+    header = header.replace(
+      `Copyright (C) 2023-2026 QuantumNous${newline}`,
+      `Copyright (C) 2023-2026 QuantumNous${newline}${modifications.join(newline)}${newline}`,
+    )
+  }
   let strippedBody = body
   while (PROJECT_COPYRIGHT_BLOCK_PATTERN.test(strippedBody)) {
     strippedBody = strippedBody
