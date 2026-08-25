@@ -51,8 +51,16 @@ export function FlipWords({
   }, [isAnimating, duration, startAnimation])
 
   return (
-    <span className={cn('relative inline-block text-left', className)}>
-      <AnimatePresence onExitComplete={() => setIsAnimating(false)}>
+    <span
+      className={cn(
+        'relative inline-block min-h-[1.15em] text-left',
+        className
+      )}
+    >
+      <AnimatePresence
+        mode='wait'
+        onExitComplete={() => setIsAnimating(false)}
+      >
         <motion.span
           key={currentWord}
           initial={{ opacity: 0, y: 10 }}
@@ -64,7 +72,6 @@ export function FlipWords({
             x: 40,
             filter: 'blur(8px)',
             scale: 2,
-            position: 'absolute',
           }}
           className='inline-block'
         >
