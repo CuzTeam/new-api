@@ -718,3 +718,22 @@ For commercial licensing, please contact support@quantumnous.com
     display: none;
   }
 }
+
+/* ── Homepage font overrides ───────────────────────────────────────────── */
+/* Non-code text: MiSans Bold; code blocks: Noto Sans Mono.
+ * Scoped to `.home-page` so global typography stays untouched. */
+.home-page {
+  --font-body: var(--font-misans);
+}
+.home-page,
+.home-page * {
+  font-family: var(--font-misans);
+}
+.home-page code,
+.home-page pre,
+.home-page kbd,
+.home-page samp,
+.home-page .font-mono,
+.home-page [class*='font-mono'] {
+  font-family: var(--font-noto-mono) !important;
+}
