@@ -57,17 +57,17 @@ export function ParetoChart(props: ParetoChartProps) {
       series: [
         {
           type: 'scatter' as const,
-          data: [
-            {
-              id: 'points',
-              values: points.map((point) => ({
-                ...point,
-                frontier: frontier.some(
-                  (f) => f.modelPermaslug === point.modelPermaslug
-                ),
-              })),
-            },
-          ],
+          // NOTE: series-level data must be a single {id, values} object;
+          // wrapping it in an array silently renders nothing in VChart.
+          data: {
+            id: 'points',
+            values: points.map((point) => ({
+              ...point,
+              frontier: frontier.some(
+                (f) => f.modelPermaslug === point.modelPermaslug
+              ),
+            })),
+          },
           xField: 'cost',
           yField: 'accuracy',
           seriesField: 'frontier',
@@ -75,7 +75,7 @@ export function ParetoChart(props: ParetoChartProps) {
         },
         {
           type: 'line' as const,
-          data: [{ id: 'frontier', values: frontier }],
+          data: { id: 'frontier', values: frontier },
           xField: 'cost',
           yField: 'accuracy',
           point: { visible: false },
