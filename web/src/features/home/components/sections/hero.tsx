@@ -23,6 +23,8 @@ import { useTranslation } from 'react-i18next'
 
 import { useStatus } from '@/hooks/use-status'
 
+import { LayoutTextFlip } from '../layout-text-flip'
+
 interface HeroProps {
   className?: string
   isAuthenticated?: boolean
@@ -56,7 +58,14 @@ export function Hero(props: HeroProps) {
           >
             {t('Unified API Gateway for')}
             <br />
-            {t('Vast Range of AI Models')}
+            <LayoutTextFlip
+              words={[
+                t('Every AI Model'),
+                t('40+ Providers'),
+                t('Claude, GPT & More'),
+                t('Your Entire LLM Stack'),
+              ]}
+            />
           </h1>
 
           <p
