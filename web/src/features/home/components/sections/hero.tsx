@@ -43,7 +43,7 @@ export function Hero(props: HeroProps) {
       <div className='mx-auto max-w-6xl'>
         <div className='max-w-3xl'>
           <p
-            className='landing-animate-fade-up text-muted-foreground font-mono text-xs font-medium tracking-[0.2em] uppercase opacity-0'
+            className='landing-animate-fade-up text-muted-foreground font-misans-regular text-xs font-medium tracking-[0.2em] uppercase opacity-0'
             style={{ animationDelay: '0ms' }}
           >
             {t('AI Application Infrastructure Foundation')}
@@ -59,7 +59,7 @@ export function Hero(props: HeroProps) {
           </h1>
 
           <p
-            className='landing-animate-fade-up text-muted-foreground mt-6 max-w-xl text-lg leading-relaxed opacity-0 md:text-xl'
+            className='landing-animate-fade-up text-muted-foreground font-misans-medium mt-6 max-w-xl text-lg leading-relaxed opacity-0 md:text-xl'
             style={{ animationDelay: '120ms' }}
           >
             {t(
