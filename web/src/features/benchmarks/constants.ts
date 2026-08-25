@@ -30,8 +30,6 @@ import {
  */
 export const BENCHMARK_API_BASE = 'https://benchmark.c0ffee.space'
 
-export const BENCHMARK_API_DOCS_URL = `${BENCHMARK_API_BASE}/openapi.json`
-
 /** Map a benchmark category id to a representative icon. */
 export const CATEGORY_ICONS: Record<string, LucideIcon> = {
   agents: Wrench,

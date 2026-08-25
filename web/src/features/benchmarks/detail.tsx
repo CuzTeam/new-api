@@ -17,13 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { Link } from '@tanstack/react-router'
-import {
-  ArrowLeft,
-  ChartColumn,
-  ChartScatter,
-  CodeXml,
-  Trophy,
-} from 'lucide-react'
+import { ArrowLeft, ChartColumn, ChartScatter, Trophy } from 'lucide-react'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -38,18 +32,13 @@ import { ModelMultiSelect } from './components/model-multi-select'
 import { ParetoChart } from './components/pareto-chart'
 import { BenchmarksSideNav, type SideNavItem } from './components/side-nav'
 import { BenchmarkStatCards } from './components/stat-cards'
-import { BENCHMARK_API_BASE, DEFAULT_SELECTED_MODELS } from './constants'
+import { DEFAULT_SELECTED_MODELS } from './constants'
 import { useBenchmarkDetail, useBenchmarksIndex } from './hooks/use-benchmarks'
 import { useScrollSpy } from './hooks/use-scroll-spy'
 import { formatRunDateTime } from './lib/format'
 import { sortByAccuracyDesc } from './lib/stats'
 
-const SECTION_IDS = [
-  'comparison',
-  'cost-efficiency',
-  'leaderboard',
-  'api-access',
-]
+const SECTION_IDS = ['comparison', 'cost-efficiency', 'leaderboard']
 
 export function BenchmarkDetail(props: { slug: string }) {
   const { t } = useTranslation()
@@ -93,7 +82,6 @@ export function BenchmarkDetail(props: { slug: string }) {
         icon: ChartScatter,
       },
       { id: 'leaderboard', label: t('Leaderboard'), icon: Trophy },
-      { id: 'api-access', label: t('API access'), icon: CodeXml },
     ],
     [t]
   )
@@ -192,7 +180,7 @@ export function BenchmarkDetail(props: { slug: string }) {
               </h2>
               <p className='text-muted-foreground mt-1 text-sm'>
                 {t(
-                  'Accuracy vs. cost, one point per model. The dashed line is the Pareto frontier: no model beats these on both accuracy and cost.'
+                  'Accuracy vs. cost, one point per model. The dashed line connects the models that no other model beats on both accuracy and cost.'
                 )}
               </p>
               <div className='bg-card mt-4 rounded-xl border p-4'>
@@ -217,29 +205,6 @@ export function BenchmarkDetail(props: { slug: string }) {
                 )}
               </p>
               <LeaderboardTable rows={orderedRows} />
-            </section>
-
-            <section
-              id='api-access'
-              aria-labelledby='benchmark-api-access-title'
-              className='scroll-mt-28'
-            >
-              <h2
-                id='benchmark-api-access-title'
-                className='text-foreground text-xl font-semibold'
-              >
-                {t('API access')}
-              </h2>
-              <p className='text-muted-foreground mt-1 text-sm'>
-                {t(
-                  'This page is rendered from the public benchmark API; the same results are available programmatically.'
-                )}
-              </p>
-              <div className='bg-card mt-4 rounded-xl border p-4'>
-                <code className='text-foreground block overflow-x-auto font-mono text-xs whitespace-nowrap'>
-                  GET {BENCHMARK_API_BASE}/api/benchmarks/{detail.slug}
-                </code>
-              </div>
             </section>
           </div>
         </div>

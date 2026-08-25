@@ -16,11 +16,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, Star } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -47,8 +46,8 @@ type LeaderboardTableProps = {
 }
 
 /**
- * Full model leaderboard with clickable sortable column headers and a
- * "Pareto" badge on models sitting on the cost/accuracy frontier. The source
+ * Full model leaderboard with clickable sortable column headers and a star
+ * marker on models sitting on the cost/accuracy frontier. The source
  * site's row expansion for provider-pinned results is omitted because the
  * scrape API returns no provider rows.
  */
@@ -133,9 +132,10 @@ export function LeaderboardTable(props: LeaderboardTableProps) {
                   {row.modelName}
                 </span>
                 {paretoSet.has(row.modelPermaslug) && (
-                  <Badge variant='secondary' className='ml-2'>
-                    {t('Pareto')}
-                  </Badge>
+                  <Star
+                    aria-hidden
+                    className='ml-1.5 inline size-3.5 fill-yellow-400 text-yellow-400'
+                  />
                 )}
               </TableCell>
               <TableCell className='font-mono tabular-nums'>

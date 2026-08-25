@@ -16,7 +16,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { ArrowUpRight, CodeXml } from 'lucide-react'
 import { useMemo, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -27,11 +26,7 @@ import { formatNumber } from '@/lib/format'
 
 import { BenchmarkSection } from './components/benchmark-section'
 import { BenchmarksSideNav, type SideNavItem } from './components/side-nav'
-import {
-  CATEGORY_ICONS,
-  DEFAULT_CATEGORY_ICON,
-  BENCHMARK_API_DOCS_URL,
-} from './constants'
+import { CATEGORY_ICONS, DEFAULT_CATEGORY_ICON } from './constants'
 import { useBenchmarksIndex } from './hooks/use-benchmarks'
 import { useScrollSpy } from './hooks/use-scroll-spy'
 import { parseBenchmarkTimestamp } from './lib/format'
@@ -109,7 +104,7 @@ export function Benchmarks() {
   return (
     <PublicLayout showMainContainer={false}>
       <PageTransition className='relative mx-auto w-full max-w-[1280px] px-3 pt-16 pb-10 sm:px-6 sm:pt-20 sm:pb-12 xl:px-8'>
-        <header className='flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between'>
+        <header className='max-w-2xl'>
           <div className='max-w-2xl'>
             <h1 className='text-foreground text-3xl font-bold tracking-tight'>
               {t('Benchmarks')}
@@ -143,22 +138,6 @@ export function Benchmarks() {
               </p>
             )}
           </div>
-
-          <a
-            href={BENCHMARK_API_DOCS_URL}
-            target='_blank'
-            rel='noreferrer'
-            className='group bg-card hover:border-primary/40 flex shrink-0 items-center gap-3 rounded-xl border px-4 py-3 transition-colors'
-          >
-            <CodeXml aria-hidden className='text-primary size-5' />
-            <span className='text-foreground text-sm font-medium'>
-              {t('Fetching benchmark data via the API')}
-            </span>
-            <ArrowUpRight
-              aria-hidden
-              className='text-muted-foreground group-hover:text-primary size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5'
-            />
-          </a>
         </header>
 
         {body}
