@@ -720,7 +720,7 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 /* ── Homepage font overrides ───────────────────────────────────────────── */
-/* Non-code text: MiSans Bold; code blocks: Noto Sans Mono.
+/* Default: MiSans Demibold; code blocks: Noto Sans Mono.
  * Scoped to `.home-page` so global typography stays untouched. */
 .home-page {
   --font-body: var(--font-misans);
@@ -736,4 +736,12 @@ For commercial licensing, please contact support@quantumnous.com
 .home-page .font-mono,
 .home-page [class*='font-mono'] {
   font-family: var(--font-noto-mono) !important;
+}
+.home-page .font-misans-regular,
+.home-page [class*='font-misans-regular'] {
+  font-family: var(--font-misans-regular) !important;
+}
+.home-page .font-misans-medium,
+.home-page [class*='font-misans-medium'] {
+  font-family: var(--font-misans-medium) !important;
 }
