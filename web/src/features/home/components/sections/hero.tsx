@@ -55,7 +55,7 @@ export function Hero(props: HeroProps) {
           >
             {t('Unified API Gateway for')}
             <br />
-            {t('Vast Range of AI Models')}
+            <span className='block mt-2'>{t('Vast Range of AI Models')}</span>
           </h1>
 
           <p
