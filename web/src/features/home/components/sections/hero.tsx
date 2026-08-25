@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useStatus } from '@/hooks/use-status'
 
-import { LayoutTextFlip } from '../layout-text-flip'
+import { FlipWords } from '../flip-words'
 
 interface HeroProps {
   className?: string
@@ -58,7 +58,7 @@ export function Hero(props: HeroProps) {
           >
             {t('Unified API Gateway for')}
             <br />
-            <LayoutTextFlip
+            <FlipWords
               words={[
                 t('Every AI Model'),
                 t('40+ Providers'),
