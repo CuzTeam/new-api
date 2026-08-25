@@ -16,17 +16,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { LanguageSwitcher } from '@/components/language-switcher'
-import { NotificationPopover } from '@/components/notification-popover'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
-import { useNotifications } from '@/hooks/use-notifications'
 import { useTopNavLinks } from '@/hooks/use-top-nav-links'
 
 import { defaultTopNavLinks } from '../config/top-nav.config'
 import type { TopNavLink } from '../types'
 import { Header } from './header'
+import { HeaderActions } from './header-actions'
 import { SystemBrand } from './system-brand'
 import { TopNav } from './top-nav'
 
@@ -107,9 +102,6 @@ export function AppHeader({
   const dynamicLinks = useTopNavLinks()
   const links = dynamicLinks.length > 0 ? dynamicLinks : navLinks
 
-  // Notifications hook
-  const notifications = useNotifications()
-
   return (
     <Header>
       <SystemBrand variant='inline' />
@@ -125,22 +117,13 @@ export function AppHeader({
               <TopNav links={links} />
             </div>
           )}
-          {showSearch && <Search />}
-          {showNotifications && (
-            <NotificationPopover
-              open={notifications.popoverOpen}
-              onOpenChange={notifications.setPopoverOpen}
-              unreadCount={notifications.unreadCount}
-              activeTab={notifications.activeTab}
-              onTabChange={notifications.setActiveTab}
-              notice={notifications.notice}
-              announcements={notifications.announcements}
-              loading={notifications.loading}
-            />
-          )}
-          <LanguageSwitcher />
-          {showThemeSwitch && <ThemeSwitch />}
-          {showProfileDropdown && <ProfileDropdown />}
+          <HeaderActions
+            showSearch={showSearch}
+            showNotifications={showNotifications}
+            showLanguageSwitcher
+            showThemeSwitch={showThemeSwitch}
+            showAuth={showProfileDropdown}
+          />
         </div>
       )}
     </Header>

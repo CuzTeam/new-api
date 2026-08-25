@@ -18,10 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute } from '@tanstack/react-router'
 
-import { Header } from '@/components/layout'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
+import { Header, HeaderActions } from '@/components/layout'
 import { ForbiddenError } from '@/features/errors/forbidden'
 import { GeneralError } from '@/features/errors/general-error'
 import { MaintenanceError } from '@/features/errors/maintenance-error'
@@ -47,10 +44,13 @@ function RouteComponent() {
   return (
     <>
       <Header>
-        <Search />
-        <div className='ms-auto flex items-center md:space-x-4'>
-          <ThemeSwitch />
-          <ProfileDropdown />
+        <div className='ms-auto flex items-center'>
+          <HeaderActions
+            showSearch
+            showLanguageSwitcher
+            showThemeSwitch
+            showAuth
+          />
         </div>
       </Header>
       <div className='flex-1 [&>div]:h-full'>

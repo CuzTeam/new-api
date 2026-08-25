@@ -19,19 +19,26 @@ For commercial licensing, please contact support@quantumnous.com
 import { render, screen } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 
+const { QueryClient, QueryClientProvider } =
+  await import('@tanstack/react-query')
 const { createMemoryHistory, createRootRoute, createRouter, RouterProvider } =
   await import('@tanstack/react-router')
 const { ThemeProvider } = await import('@/context/theme-provider')
 const { AuthLayout } = await import('../auth-layout')
 
 function renderAuthLayout() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  })
   const rootRoute = createRootRoute({
     component: () => (
-      <ThemeProvider>
-        <AuthLayout>
-          <div>page content</div>
-        </AuthLayout>
-      </ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <AuthLayout>
+            <div>page content</div>
+          </AuthLayout>
+        </ThemeProvider>
+      </QueryClientProvider>
     ),
   })
   const router = createRouter({
@@ -42,21 +49,35 @@ function renderAuthLayout() {
 }
 
 describe('auth layout top bar', () => {
-  test('renders the language switcher and the theme cycle toggle on auth pages', async () => {
+  test('renders the unified public header with language and theme controls', async () => {
     renderAuthLayout()
 
+    // The header renders desktop and mobile action sets, so each
+    // control appears twice; both copies must be present.
     expect(
-      await screen.findByRole('button', { name: /change language/i })
-    ).toBeInTheDocument()
+      (await screen.findAllByRole('button', { name: /change language/i }))
+        .length
+    ).toBe(2)
     expect(
-      screen.getByRole('button', { name: /toggle theme/i })
-    ).toBeInTheDocument()
+      screen.getAllByRole('button', { name: /toggle theme/i }).length
+    ).toBe(2)
+  })
+
+  test('hides navigation, notifications and auth buttons on auth pages', async () => {
+    renderAuthLayout()
+
+    await screen.findAllByRole('button', { name: /toggle theme/i })
+    expect(screen.queryByRole('button', { name: /notifications/i })).toBeNull()
+    expect(
+      screen.queryByRole('button', { name: /toggle navigation menu/i })
+    ).toBeNull()
+    expect(screen.queryByRole('link', { name: /sign in/i })).toBeNull()
   })
 
   test('still renders the page content and the home logo link', async () => {
     renderAuthLayout()
 
     expect(await screen.findByText('page content')).toBeInTheDocument()
-    expect(screen.getByRole('link')).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link').getAttribute('href')).toBe('/')
   })
 })
