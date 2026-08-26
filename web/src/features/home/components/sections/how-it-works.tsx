@@ -73,8 +73,8 @@ export function HowItWorks() {
               <span className='text-muted-foreground font-misans-regular text-sm tabular-nums'>
                 {step.num}
               </span>
-              <h3 className='mt-4 text-lg font-semibold'>{step.title}</h3>
-              <p className='text-muted-foreground mt-2 text-sm leading-relaxed'>
+              <h3 className='font-misans-medium mt-4 text-lg font-semibold'>{step.title}</h3>
+              <p className='text-muted-foreground font-misans-regular mt-2 text-sm leading-relaxed'>
                 {step.desc}
               </p>
             </AnimateInView>
