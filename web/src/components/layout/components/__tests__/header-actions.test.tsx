@@ -88,6 +88,7 @@ describe('header actions group', () => {
       'Change language',
       'Toggle theme: System',
       'Sign in',
+      'Sign up',
     ])
   })
 
@@ -99,6 +100,7 @@ describe('header actions group', () => {
       'Change language',
       'Toggle theme: System',
       'Sign in',
+      'Sign up',
     ])
   })
 })

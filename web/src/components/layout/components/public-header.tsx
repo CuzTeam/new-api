@@ -26,6 +26,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useStatus } from '@/hooks/use-status'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import { useTopNavLinks } from '@/hooks/use-top-nav-links'
 import { cn } from '@/lib/utils'
@@ -90,6 +91,9 @@ export function PublicHeader(props: PublicHeaderProps) {
   const routerState = useRouterState()
   const pathname = routerState.location.pathname
   const isAuthenticated = !!useAuthStore((s) => s.auth.user)
+  const { status } = useStatus()
+  const registerEnabled =
+    !status?.self_use_mode_enabled && status?.register_enabled !== false
 
   const displaySiteName = customSiteName || systemName
   const links = dynamicLinks.length > 0 ? dynamicLinks : navLinks
@@ -363,6 +367,15 @@ export function PublicHeader(props: PublicHeaderProps) {
                   className='bg-foreground text-background inline-flex h-10 items-center justify-center rounded-lg text-sm font-medium transition-opacity hover:opacity-90 active:opacity-80'
                 >
                   {isAuthenticated ? t('Go to Dashboard') : t('Sign in')}
+                </Link>
+              )}
+              {showAuthButtons && !isAuthenticated && registerEnabled && (
+                <Link
+                  to='/sign-up'
+                  onClick={() => setMobileOpen(false)}
+                  className='border-foreground/35 hover:bg-muted/60 inline-flex h-10 items-center justify-center rounded-lg border bg-transparent text-sm font-medium transition-colors'
+                >
+                  {t('Sign up')}
                 </Link>
               )}
             </div>
