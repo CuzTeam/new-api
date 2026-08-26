@@ -17,67 +17,51 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { Link } from '@tanstack/react-router'
-import { Fragment, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useStatus } from '@/hooks/use-status'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import { cn } from '@/lib/utils'
 
-interface FooterLink {
-  text: string
-  href: string
-}
-
-interface FooterColumnProps {
-  title: string
-  links: FooterLink[]
-}
+const PROJECT_REPOSITORY_URL = 'https://github.com/CuzTeam/new-api'
+const HITOKOTO_API_URL = 'https://v1.hitokoto.cn/'
+const HITOKOTO_FALLBACK_QUOTE = '人是要整活的——没活了，可不就是死了么？'
 
 interface FooterProps {
-  logo?: string
-  name?: string
-  columns?: FooterColumnProps[]
-  copyright?: string
   className?: string
 }
 
-const NEW_API_FOOTER_ATTRIBUTION_KEY = [
-  'footer',
-  'new' + 'api',
-  'projectAttributionSuffix',
-].join('.')
-
-function FooterLinkItem(props: { link: FooterLink }) {
-  const { t } = useTranslation()
-  const isExternal = props.link.href.startsWith('http')
-  const label = t(props.link.text)
-
-  if (isExternal) {
-    return (
-      <a
-        href={props.link.href}
-        target='_blank'
-        rel='noopener noreferrer'
-        className='text-muted-foreground hover:text-foreground text-sm transition-colors duration-200'
-      >
-        {label}
-      </a>
-    )
-  }
-
-  return (
-    <Link
-      to={props.link.href}
-      className='text-muted-foreground hover:text-foreground text-sm transition-colors duration-200'
-    >
-      {label}
-    </Link>
-  )
+/**
+ * Fetches a random quote from the Hitokoto API (https://v1.hitokoto.cn/).
+ * Falls back to a fixed quote while loading or when the request fails so the
+ * footer always renders a sentence.
+ */
+function useHitokoto(): string {
+  const { data } = useQuery({
+    queryKey: ['hitokoto'],
+    queryFn: async () => {
+      const response = await fetch(HITOKOTO_API_URL)
+      if (!response.ok) {
+        throw new Error(`Hitokoto request failed: ${response.status}`)
+      }
+      const payload: unknown = await response.json()
+      const sentence = (payload as { hitokoto?: unknown } | null)?.hitokoto
+      if (typeof sentence !== 'string' || sentence.trim().length === 0) {
+        throw new Error('Hitokoto response missing sentence')
+      }
+      return sentence
+    },
+    // Fail fast to the fallback quote instead of retrying an external service.
+    retry: false,
+    placeholderData: HITOKOTO_FALLBACK_QUOTE,
+  })
+  return data || HITOKOTO_FALLBACK_QUOTE
 }
 
 // Renders User Agreement / Privacy Policy links inline with the parent's
-// copyright row when either is configured in System Settings → Site. Emits
+// credit row when either is configured in System Settings → Site. Emits
 // fragmented siblings so the parent flex container's gap controls spacing.
 function LegalLinks(props: { leadingSeparator?: boolean }) {
   const { t } = useTranslation()
@@ -121,187 +105,74 @@ function LegalLinks(props: { leadingSeparator?: boolean }) {
   )
 }
 
-// inline=true returns just the inner span for composition in a parent flex
-// row. inline=false wraps in a centered/right-aligned div (default).
-function ProjectAttribution(props: { currentYear: number; inline?: boolean }) {
-  const { t } = useTranslation()
-  const content = (
-    <span className='text-muted-foreground/45'>
-      &copy; {props.currentYear}{' '}
-      <a
-        href='https://github.com/QuantumNous/new-api'
-        target='_blank'
-        rel='noopener noreferrer'
-        className='text-foreground/70 hover:text-foreground font-medium transition-colors'
-      >
-        {t('New API')}
-      </a>
-      . {t(NEW_API_FOOTER_ATTRIBUTION_KEY)}
-    </span>
-  )
-  if (props.inline) {
-    return content
-  }
-  return (
-    <div className='text-muted-foreground/45 text-center text-xs sm:text-right'>
-      {content}
-    </div>
-  )
-}
-
 export function Footer(props: FooterProps) {
   const { t } = useTranslation()
-  const {
-    systemName,
-    logo: systemLogo,
-    footerHtml,
-    demoSiteEnabled,
-  } = useSystemConfig()
+  const { systemName, footerHtml } = useSystemConfig()
+  const { status } = useStatus()
+  const quote = useHitokoto()
 
-  const displayLogo = systemLogo || props.logo || '/logo.png'
-  const displayName = systemName || props.name || 'New API'
-  const isDemoSiteMode = Boolean(demoSiteEnabled)
-  const currentYear = new Date().getFullYear()
-
-  const fallbackColumns = useMemo<FooterColumnProps[]>(
-    () => [
-      {
-        title: t('footer.columns.about.title'),
-        links: [
-          {
-            text: t('footer.columns.about.links.aboutProject'),
-            href: 'https://docs.newapi.pro/wiki/project-introduction/',
-          },
-          {
-            text: t('footer.columns.about.links.contact'),
-            href: 'https://docs.newapi.pro/support/community-interaction/',
-          },
-          {
-            text: t('footer.columns.about.links.features'),
-            href: 'https://docs.newapi.pro/wiki/features-introduction/',
-          },
-        ],
-      },
-      {
-        title: t('footer.columns.docs.title'),
-        links: [
-          {
-            text: t('footer.columns.docs.links.quickStart'),
-            href: 'https://docs.newapi.pro/getting-started/',
-          },
-          {
-            text: t('footer.columns.docs.links.installation'),
-            href: 'https://docs.newapi.pro/installation/',
-          },
-          {
-            text: t('footer.columns.docs.links.apiDocs'),
-            href: 'https://docs.newapi.pro/api/',
-          },
-        ],
-      },
-      {
-        title: t('footer.columns.related.title'),
-        links: [
-          {
-            text: t('footer.columns.related.links.oneApi'),
-            href: 'https://github.com/songquanpeng/one-api',
-          },
-          {
-            text: t('footer.columns.related.links.midjourney'),
-            href: 'https://github.com/novicezk/midjourney-proxy',
-          },
-          {
-            text: t('footer.columns.related.links.newApiKeyTool'),
-            href: 'https://github.com/Calcium-Ion/new-api-key-tool',
-          },
-        ],
-      },
-    ],
-    [t]
-  )
-
-  const displayColumns = props.columns ?? fallbackColumns
-
-  if (footerHtml) {
-    return (
-      <footer
-        className={cn(
-          'border-border/40 relative z-10 border-t',
-          props.className
-        )}
-      >
-        <div className='mx-auto w-full max-w-6xl px-6 py-5'>
-          <div className='bg-muted/20 border-border/50 flex flex-col items-center justify-between gap-4 rounded-2xl border px-4 py-4 backdrop-blur-sm sm:flex-row sm:px-5'>
-            <div
-              className='custom-footer text-muted-foreground min-w-0 text-center text-sm sm:text-left'
-              dangerouslySetInnerHTML={{ __html: footerHtml }}
-            />
-            <div className='border-border/60 text-muted-foreground/45 flex w-full flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t pt-4 text-xs sm:w-auto sm:justify-end sm:border-t-0 sm:border-l sm:pt-0 sm:pl-5'>
-              <LegalLinks />
-              <ProjectAttribution currentYear={currentYear} inline />
-            </div>
-          </div>
-        </div>
-      </footer>
-    )
-  }
+  const displayName = systemName || 'New API'
+  const version =
+    typeof status?.version === 'string' ? status.version.trim() : ''
 
   return (
     <footer
       className={cn('border-border/40 relative z-10 border-t', props.className)}
     >
-      <div className='mx-auto max-w-6xl px-6 py-12 md:py-16'>
-        <div className='flex flex-col justify-between gap-10 md:flex-row md:gap-16'>
-          {/* Brand column */}
-          <div className='shrink-0'>
-            <Link to='/' className='group flex items-center gap-2.5'>
-              <img
-                src={displayLogo}
-                alt={displayName}
-                className='size-7 rounded-lg object-contain'
-              />
-              <span className='text-sm font-semibold tracking-tight'>
-                {displayName}
-              </span>
-            </Link>
-            <p className='text-muted-foreground/60 mt-3 max-w-[200px] text-xs leading-relaxed'>
-              {t('Powerful API Management Platform')}
-            </p>
-          </div>
+      <div className='mx-auto flex w-full max-w-6xl flex-col items-center gap-8 px-6 py-14 text-center'>
+        {/* Custom area: free-form HTML configured in System Settings → Site,
+            rendered unwrapped at the top of the footer. */}
+        {footerHtml && (
+          <div
+            className='custom-footer text-muted-foreground w-full text-sm'
+            dangerouslySetInnerHTML={{ __html: footerHtml }}
+          />
+        )}
 
-          {/* Links columns */}
-          {isDemoSiteMode && (
-            <div className='grid grid-cols-3 gap-8 md:gap-16'>
-              {displayColumns.map((column, index) => (
-                <div key={index}>
-                  <p className='text-muted-foreground/50 mb-3 text-xs font-medium tracking-wider uppercase'>
-                    {t(column.title)}
-                  </p>
-                  <ul className='space-y-2.5'>
-                    {column.links.map((link, linkIndex) => (
-                      <li key={linkIndex}>
-                        <FooterLinkItem link={link} />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
+        {/* Hitokoto quote, refreshed from the API on every visit. */}
+        <p className='text-foreground/90 max-w-2xl text-base leading-relaxed font-medium sm:text-lg'>
+          {quote}
+        </p>
+
+        {/* Site name (commit hash) | Open Source Software — all links point
+            to the project repository. */}
+        <p className='text-foreground/80 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm font-medium sm:text-base'>
+          <a
+            href={PROJECT_REPOSITORY_URL}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='hover:text-foreground transition-colors duration-200'
+          >
+            {displayName}
+          </a>
+          {version && (
+            <a
+              href={PROJECT_REPOSITORY_URL}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='text-muted-foreground hover:text-foreground transition-colors duration-200'
+            >
+              ({version})
+            </a>
           )}
-        </div>
+          <span aria-hidden='true' className='text-muted-foreground/40'>
+            |
+          </span>
+          <a
+            href={PROJECT_REPOSITORY_URL}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='hover:text-foreground transition-colors duration-200'
+          >
+            {t('Open Source Software')}
+          </a>
+        </p>
 
-        {/* Copyright + optional legal links inline on the left, project
-            attribution on the right; wraps on narrow screens. */}
-        <div className='border-border/30 mt-12 flex flex-col items-center justify-between gap-x-3 gap-y-2 border-t pt-6 sm:flex-row'>
-          <div className='text-muted-foreground/40 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs sm:justify-start'>
-            <span>
-              &copy; {currentYear} {displayName}.{' '}
-              {props.copyright ?? t('footer.defaultCopyright')}
-            </span>
-            <LegalLinks leadingSeparator />
-          </div>
-          <ProjectAttribution currentYear={currentYear} />
-        </div>
+        {/* Credit row with optional legal links. */}
+        <p className='text-muted-foreground/50 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs'>
+          <span>{t('Design by New-API & Cuz Technology,')}</span>
+          <LegalLinks leadingSeparator />
+        </p>
       </div>
     </footer>
   )

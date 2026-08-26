@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2023-2026 QuantumNous
+Modifications Copyright (C) 2026 Cuz Technology
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
@@ -22,6 +23,9 @@ import { useTranslation } from 'react-i18next'
 
 import { useStatus } from '@/hooks/use-status'
 
+import { FlipWords } from '../flip-words'
+import { HubDiagram } from '../hub-diagram'
+
 interface HeroProps {
   className?: string
   isAuthenticated?: boolean
@@ -39,8 +43,8 @@ export function Hero(props: HeroProps) {
   const docsIsExternal = docsUrl.startsWith('http')
 
   return (
-    <section className='px-6 pt-24 md:pt-32 lg:pt-40'>
-      <div className='mx-auto max-w-6xl'>
+    <section className='flex min-h-[calc(100svh-var(--app-header-height,3rem))] flex-col justify-center px-6'>
+      <div className='mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-10'>
         <div className='max-w-3xl'>
           <p
             className='landing-animate-fade-up text-muted-foreground font-misans-regular text-xs font-medium tracking-[0.2em] uppercase opacity-0'
@@ -50,12 +54,20 @@ export function Hero(props: HeroProps) {
           </p>
 
           <h1
-            className='landing-animate-fade-up mt-6 text-5xl font-medium tracking-tight text-balance opacity-0 sm:text-6xl lg:text-7xl'
+            className='landing-animate-fade-up mt-6 text-4xl font-medium tracking-tight text-balance opacity-0 sm:text-5xl lg:text-6xl'
             style={{ animationDelay: '60ms' }}
           >
             {t('Unified API Gateway for')}
             <br />
-            <span className='block mt-2'>{t('Vast Range of AI Models')}</span>
+            <FlipWords
+              className='text-[#7300ff] dark:text-[#cf9fff]'
+              words={[
+                t('Every AI Model'),
+                t('40+ Providers'),
+                t('Claude, GPT & More'),
+                t('Your Entire LLM Stack'),
+              ]}
+            />
           </h1>
 
           <p
@@ -115,6 +127,7 @@ export function Hero(props: HeroProps) {
             )}
           </div>
         </div>
+        <HubDiagram className='hidden lg:block' />
       </div>
     </section>
   )
