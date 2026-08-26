@@ -54,17 +54,33 @@ const ICON_LEFT = 328
 
 interface HubDiagramProps {
   className?: string
+  /**
+   * Turns the center hub into a control. Fires on hover, focus and tap, which
+   * is what the showcase card listens to before flipping to the API example.
+   */
+  onHubActivate?: () => void
+  /** Accessible name for the hub control; required with `onHubActivate`. */
+  hubLabel?: string
 }
 
 /**
  * Zeabur-style routing diagram: an infinitely scrolling pill of LLM provider
  * icons on the left converges into the New API hub, then fans out through
- * colored bezier curves to developer tools on the right. Decorative only.
+ * colored bezier curves to developer tools on the right.
+ *
+ * Decorative unless `onHubActivate` is passed, which promotes the center hub
+ * to a real button so keyboard and touch users get the same affordance.
  */
-export function HubDiagram({ className }: HubDiagramProps) {
+export function HubDiagram({
+  className,
+  onHubActivate,
+  hubLabel,
+}: HubDiagramProps) {
+  const HubTag = onHubActivate ? 'button' : 'div'
+
   return (
     <div
-      aria-hidden='true'
+      aria-hidden={onHubActivate ? undefined : 'true'}
       className={cn(
         'relative overflow-hidden rounded-[2rem]',
         className
@@ -118,9 +134,22 @@ export function HubDiagram({ className }: HubDiagramProps) {
         {/* Center: New API hub */}
         <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
           <div className='absolute -inset-5 rounded-full bg-primary/20 blur-2xl' />
-          <div className='relative flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-card shadow-lg'>
+          <HubTag
+            {...(onHubActivate && {
+              type: 'button' as const,
+              'aria-label': hubLabel,
+              onMouseEnter: onHubActivate,
+              onFocus: onHubActivate,
+              onClick: onHubActivate,
+            })}
+            className={cn(
+              'border-border bg-card relative flex h-16 w-16 items-center justify-center rounded-2xl border shadow-lg',
+              onHubActivate &&
+                'focus-visible:ring-ring/50 cursor-pointer transition-transform duration-300 outline-none hover:scale-110 focus-visible:ring-3'
+            )}
+          >
             <Logo className='size-8' />
-          </div>
+          </HubTag>
         </div>
 
         {/* Right: developer tool icons */}

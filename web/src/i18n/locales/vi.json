@@ -4270,6 +4270,8 @@
     "Show sensitive data": "Hiển thị dữ liệu nhạy cảm",
     "Show setup guide": "Hiển thị hướng dẫn thiết lập",
     "Show source": "Hiển thị nguồn",
+    "Show the API example": "Hiển thị ví dụ API",
+    "Show the routing diagram": "Hiển thị sơ đồ định tuyến",
     "Show token usage statistics in the UI": "Hiển thị thống kê sử dụng token trong giao diện người dùng",
     "Showcase core capabilities with demo credentials and limited access.": "Trình diễn các tính năng cốt lõi với thông tin đăng nhập demo và quyền truy cập hạn chế.",
     "Showing": "Đang hiển thị",
