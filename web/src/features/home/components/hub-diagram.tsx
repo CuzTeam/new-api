@@ -34,10 +34,10 @@ const LLM_ICONS = [
 ] as const
 
 const DEV_ICONS = [
-  { name: 'Cursor', y: 39 },
-  { name: 'GithubCopilot', y: 134 },
-  { name: 'Trae.Color', y: 229 },
-  { name: 'Codex.Color', y: 324 },
+  { name: 'Cursor.Mono', y: 39 },
+  { name: 'GithubCopilot.Mono', y: 134 },
+  { name: 'Trae.Mono', y: 229 },
+  { name: 'Codex.Mono', y: 324 },
 ] as const
 
 /** Right-side fan-out curve colors, one per dev tool icon. */
