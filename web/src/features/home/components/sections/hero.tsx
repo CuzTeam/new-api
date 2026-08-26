@@ -59,8 +59,7 @@ export function Hero(props: HeroProps) {
           >
             {t('Unified API Gateway for')}
             <br />
-            <span className='block mt-3'>
-              <FlipWords
+            <FlipWords
               className='text-[#7300ff] dark:text-[#cf9fff]'
               words={[
                 t('Every AI Model'),
@@ -68,8 +67,7 @@ export function Hero(props: HeroProps) {
                 t('Claude, GPT & More'),
                 t('Your Entire LLM Stack'),
               ]}
-              />
-            </span>
+            />
           </h1>
 
           <p
