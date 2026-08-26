@@ -66,7 +66,7 @@ export function HubDiagram({ className }: HubDiagramProps) {
     <div
       aria-hidden='true'
       className={cn(
-        'relative overflow-hidden rounded-[2rem] bg-muted/50',
+        'relative overflow-hidden rounded-[2rem]',
         className
       )}
     >
