@@ -18,6 +18,8 @@ import { Component, useMemo, useState, type ReactNode } from 'react'
 
 import { GrainGradient } from '@paper-design/shaders-react'
 
+import { useTheme } from '@/context/theme-provider'
+
 /**
  * Static glow used when WebGL is unavailable — keeps the showcase card
  * readable without the grainy gradient.
@@ -73,13 +75,15 @@ function isWebGLAvailable(): boolean {
 }
 
 /**
- * Grainy gradient backdrop for the inverted showcase card (Fumadocs-style).
- * The card is always dark, so colors are fixed; color pools at the corners
- * and leaves the center quiet for the terminal. Animation freezes for users
- * who prefer reduced motion; missing WebGL falls back to a static glow.
+ * Grainy gradient backdrop for the showcase card.
+ * Colors adapt to the current theme (light/dark).
+ * Animation freezes for users who prefer reduced motion;
+ * missing WebGL falls back to a static glow.
  */
 export function GrainField() {
   const [supported] = useState(isWebGLAvailable)
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
 
   const reducedMotion = useMemo(() => {
     if (typeof window === 'undefined') return false
@@ -98,8 +102,8 @@ export function GrainField() {
       <ShaderBoundary>
         <GrainGradient
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-          colors={['#7300ff', '#eba8ff']}
-          colorBack='#0a0a0a'
+          colors={isDark ? ['#7300ff', '#eba8ff'] : ['#7300ff', '#c9a0ff']}
+          colorBack={isDark ? '#0a0a0a' : '#f8f8f8'}
           softness={0.5}
           intensity={0.5}
           noise={0.25}

@@ -92,10 +92,10 @@ export function Features(_props: FeaturesProps) {
     <section className='px-6'>
       <div className='mx-auto mt-24 max-w-6xl sm:mt-32 lg:mt-40'>
         <AnimateInView className='max-w-2xl'>
-          <p className='text-muted-foreground font-mono text-xs font-medium tracking-[0.2em] uppercase'>
+          <p className='text-muted-foreground font-misans-regular text-xs font-medium tracking-[0.2em] uppercase'>
             {t('Core Features')}
           </p>
-          <h2 className='mt-4 text-3xl font-medium tracking-tight text-balance sm:text-4xl'>
+          <h2 className='font-misans-medium mt-4 text-3xl font-medium tracking-tight text-balance sm:text-4xl'>
             {t('Built for developers,')} {t('designed for scale')}
           </h2>
         </AnimateInView>
@@ -112,8 +112,8 @@ export function Features(_props: FeaturesProps) {
                 className='text-muted-foreground size-5'
                 strokeWidth={1.5}
               />
-              <h3 className='mt-4 text-base font-semibold'>{f.title}</h3>
-              <p className='text-muted-foreground mt-2 text-sm leading-relaxed'>
+              <h3 className='font-misans-medium mt-4 text-base font-semibold'>{f.title}</h3>
+              <p className='text-muted-foreground font-misans-regular mt-2 text-sm leading-relaxed'>
                 {f.desc}
               </p>
             </AnimateInView>

@@ -68,10 +68,8 @@ export function FlipWords({
           transition={{ type: 'spring', stiffness: 100, damping: 10 }}
           exit={{
             opacity: 0,
-            y: -40,
-            x: 40,
-            filter: 'blur(8px)',
-            scale: 2,
+            y: -10,
+            filter: 'blur(4px)',
           }}
           className='inline-block'
         >

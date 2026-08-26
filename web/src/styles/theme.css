@@ -39,6 +39,11 @@ For commercial licensing, please contact support@quantumnous.com
   --font-manrope:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
     'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --font-misans: 'MiSans Demibold', 'MiSans', var(--font-sans);
+  --font-misans-regular: 'MiSans Regular', 'MiSans', var(--font-sans);
+  --font-misans-medium: 'MiSans Medium', 'MiSans', var(--font-sans);
+  --font-noto-mono: 'Noto Sans Mono', ui-monospace, SFMono-Regular, 'SF Mono',
+    Menlo, Consolas, 'Liberation Mono', monospace;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

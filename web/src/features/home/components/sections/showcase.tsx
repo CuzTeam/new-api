@@ -29,44 +29,32 @@ interface ShowcaseProps {
 }
 
 /**
- * Inverted showcase card: the live API terminal on a grainy gradient panel —
- * the visual anchor of the landing page. The `dark` class forces dark-variant
- * rendering of the terminal even when the site is in light mode.
+ * Showcase card: the live API terminal on a grainy gradient panel —
+ * the visual anchor of the landing page.
  *
- * On scroll, the section pins to the viewport and the card scales up until it
- * covers the whole screen (scrubbed); releasing the pin resumes normal flow.
+ * On scroll, the background grain scales up while the terminal card stays fixed.
  */
 export function Showcase(_props: ShowcaseProps) {
   const sectionRef = useRef<HTMLElement>(null)
-  const cardRef = useRef<HTMLDivElement>(null)
+  const bgRef = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       return
     }
     const section = sectionRef.current
-    const card = cardRef.current
-    if (!section || !card) {
+    const bg = bgRef.current
+    if (!section || !bg) {
       return
     }
 
     const ctx = gsap.context(() => {
-      gsap.to(card, {
-        // Grow until the card covers the viewport in both axes.
+      gsap.to(bg, {
         scale: () =>
           Math.max(
-            window.innerWidth / card.offsetWidth,
-            window.innerHeight / card.offsetHeight
+            window.innerWidth / bg.offsetWidth,
+            window.innerHeight / bg.offsetHeight
           ),
-        // Keep the card centered on the viewport even when the section is
-        // taller than one screen (small viewports).
-        y: () => {
-          const cardRect = card.getBoundingClientRect()
-          const sectionRect = section.getBoundingClientRect()
-          const cardCenter = cardRect.top - sectionRect.top + cardRect.height / 2
-          return window.innerHeight / 2 - cardCenter
-        },
-        borderRadius: 0,
         ease: 'none',
         scrollTrigger: {
           trigger: section,
@@ -86,11 +74,10 @@ export function Showcase(_props: ShowcaseProps) {
   return (
     <section ref={sectionRef} className='flex min-h-svh items-center px-6'>
       <div className='mx-auto w-full max-w-6xl'>
-        <div
-          ref={cardRef}
-          className='dark relative overflow-hidden rounded-[2.5rem] bg-neutral-950 px-6 py-16 sm:px-10 sm:py-20 lg:px-14 dark:bg-[#151515] dark:ring-1 dark:ring-white/10'
-        >
-          <GrainField />
+        <div className='relative overflow-hidden rounded-[2.5rem] bg-background px-6 py-16 ring-1 ring-border sm:px-10 sm:py-20 lg:px-14'>
+          <div ref={bgRef} className='absolute inset-0'>
+            <GrainField />
+          </div>
           <HeroTerminalDemo className='relative' />
         </div>
       </div>

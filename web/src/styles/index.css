@@ -718,3 +718,19 @@ For commercial licensing, please contact support@quantumnous.com
     display: none;
   }
 }
+
+/* ── Homepage font overrides ───────────────────────────────────────────── */
+/* Scoped to `.home-page` so global typography stays untouched.
+ * Individual elements use font-misans / font-misans-regular / font-misans-medium
+ * to set the correct weight. Code blocks get Noto Sans Mono. */
+.home-page {
+  --font-body: var(--font-misans);
+}
+.home-page code,
+.home-page pre,
+.home-page kbd,
+.home-page samp,
+.home-page .font-mono,
+.home-page [class*='font-mono'] {
+  font-family: var(--font-noto-mono) !important;
+}

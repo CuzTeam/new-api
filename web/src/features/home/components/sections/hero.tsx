@@ -47,31 +47,31 @@ export function Hero(props: HeroProps) {
       <div className='mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-10'>
         <div className='max-w-3xl'>
           <p
-            className='landing-animate-fade-up text-muted-foreground font-mono text-xs font-medium tracking-[0.2em] uppercase opacity-0'
+            className='landing-animate-fade-up text-muted-foreground font-misans-regular text-xs font-medium tracking-[0.2em] uppercase opacity-0'
             style={{ animationDelay: '0ms' }}
           >
             {t('AI Application Infrastructure Foundation')}
           </p>
 
           <h1
-            className='landing-animate-fade-up mt-6 text-4xl font-medium tracking-tight text-balance opacity-0 sm:text-5xl lg:text-6xl'
+            className='landing-animate-fade-up font-misans mt-8 text-4xl font-medium tracking-tight opacity-0 sm:text-5xl lg:text-6xl'
             style={{ animationDelay: '60ms' }}
           >
             {t('Unified API Gateway for')}
-            <br />
+            <span className='block h-4' />
             <FlipWords
               className='text-[#7300ff] dark:text-[#cf9fff]'
               words={[
-                t('Every AI Model'),
-                t('40+ Providers'),
-                t('Claude, GPT & More'),
-                t('Your Entire LLM Stack'),
+                t('Every AI Model.'),
+                t('40+ Providers.'),
+                t('Claude, GPT & More.'),
+                t('Your Entire LLM Stack.'),
               ]}
             />
           </h1>
 
           <p
-            className='landing-animate-fade-up text-muted-foreground mt-6 max-w-xl text-lg leading-relaxed opacity-0 md:text-xl'
+            className='landing-animate-fade-up text-muted-foreground font-misans-medium mt-6 max-w-xl text-lg leading-relaxed opacity-0 md:text-xl'
             style={{ animationDelay: '120ms' }}
           >
             {t(
@@ -113,18 +113,16 @@ export function Hero(props: HeroProps) {
                 href={docsUrl}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='text-muted-foreground hover:text-foreground inline-flex h-11 items-center gap-1 text-sm font-medium transition-colors'
+                className='ring-border hover:bg-muted/60 inline-flex h-11 items-center gap-1 rounded-full px-6 text-sm font-semibold ring-1 transition-colors'
               >
                 {t('Docs')}
-                <ArrowRight className='size-3.5' />
               </a>
             ) : (
               <Link
                 to={docsUrl}
-                className='text-muted-foreground hover:text-foreground inline-flex h-11 items-center gap-1 text-sm font-medium transition-colors'
+                className='ring-border hover:bg-muted/60 inline-flex h-11 items-center gap-1 rounded-full px-6 text-sm font-semibold ring-1 transition-colors'
               >
                 {t('Docs')}
-                <ArrowRight className='size-3.5' />
               </Link>
             )}
           </div>
