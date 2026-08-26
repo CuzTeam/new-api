@@ -58,16 +58,17 @@ export function Hero(props: HeroProps) {
             style={{ animationDelay: '60ms' }}
           >
             {t('Unified API Gateway for')}
-            <br />
-            <FlipWords
-              className='text-[#7300ff] dark:text-[#cf9fff]'
-              words={[
-                t('Every AI Model'),
-                t('40+ Providers'),
-                t('Claude, GPT & More'),
-                t('Your Entire LLM Stack'),
-              ]}
-            />
+            <span className='block mt-4'>
+              <FlipWords
+                className='text-[#7300ff] dark:text-[#cf9fff]'
+                words={[
+                  t('Every AI Model.'),
+                  t('40+ Providers.'),
+                  t('Claude, GPT & More.'),
+                  t('Your Entire LLM Stack.'),
+                ]}
+              />
+            </span>
           </h1>
 
           <p
