@@ -66,7 +66,7 @@ export function HubDiagram({ className }: HubDiagramProps) {
     <div
       aria-hidden='true'
       className={cn(
-        'dark relative overflow-hidden rounded-[2rem] bg-neutral-950 shadow-xl ring-1 ring-black/10 dark:bg-[#151515] dark:ring-white/10',
+        'relative overflow-hidden rounded-[2rem] bg-muted/50 shadow-xl ring-1 ring-border',
         className
       )}
     >
@@ -87,7 +87,7 @@ export function HubDiagram({ className }: HubDiagramProps) {
             y2={HUB_CENTER_Y}
             stroke='currentColor'
             strokeWidth={1.5}
-            className='text-white/20'
+            className='text-border'
           />
           {DEV_ICONS.map((icon, i) => {
             const yc = icon.y + 28
@@ -104,11 +104,11 @@ export function HubDiagram({ className }: HubDiagramProps) {
         </svg>
 
         {/* Left: infinitely scrolling LLM icon pill */}
-        <div className='scroll-container absolute top-[50px] bottom-[50px] left-4 w-14 overflow-hidden rounded-full border border-white/10 bg-white/[0.04] [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)]'>
+        <div className='scroll-container absolute top-[50px] bottom-[50px] left-4 w-14 overflow-hidden rounded-full border border-border bg-background/80 [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)]'>
           <div className='animate-scroll-down flex flex-col items-center gap-6 py-3'>
             {[...LLM_ICONS, ...LLM_ICONS].map((iconName, i) => (
               // oxlint-disable-next-line react/no-array-index-key
-              <span key={`${iconName}-${i}`} className='shrink-0 text-white'>
+              <span key={`${iconName}-${i}`} className='shrink-0 text-foreground'>
                 {getLobeIcon(iconName, 26)}
               </span>
             ))}
@@ -117,8 +117,8 @@ export function HubDiagram({ className }: HubDiagramProps) {
 
         {/* Center: New API hub */}
         <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
-          <div className='absolute -inset-5 rounded-full bg-[#7300ff]/25 blur-2xl' />
-          <div className='relative flex h-16 w-16 items-center justify-center rounded-2xl border border-white/15 bg-neutral-900 shadow-lg'>
+          <div className='absolute -inset-5 rounded-full bg-primary/20 blur-2xl' />
+          <div className='relative flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-card shadow-lg'>
             <Logo className='size-8' />
           </div>
         </div>
@@ -127,7 +127,7 @@ export function HubDiagram({ className }: HubDiagramProps) {
         {DEV_ICONS.map((icon) => (
           <div
             key={icon.name}
-            className='absolute flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-white'
+            className='absolute flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-card text-foreground shadow-sm'
             style={{ left: ICON_LEFT, top: icon.y }}
           >
             {getLobeIcon(icon.name, 26)}
