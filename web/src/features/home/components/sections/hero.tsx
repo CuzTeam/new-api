@@ -54,7 +54,7 @@ export function Hero(props: HeroProps) {
           </p>
 
           <h1
-            className='landing-animate-fade-up font-misans mt-6 text-3xl font-medium tracking-tight opacity-0 sm:text-4xl lg:text-5xl'
+            className='landing-animate-fade-up font-misans mt-8 text-4xl font-medium tracking-tight opacity-0 sm:text-5xl lg:text-6xl'
             style={{ animationDelay: '60ms' }}
           >
             {t('Unified API Gateway for')}{' '}
