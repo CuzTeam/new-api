@@ -27,6 +27,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useNotifications } from '@/hooks/use-notifications'
+import { useStatus } from '@/hooks/use-status'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -37,6 +38,9 @@ import { useAuthStore } from '@/stores/auth-store'
  * theme, account. Each top bar only toggles which items it needs, so the
  * sequence and sizing stay identical across public pages, the console,
  * error pages, and auth pages.
+ *
+ * Signed out, the account slot is a filled "Sign in" followed by an outlined
+ * "Sign up"; the latter is hidden wherever registration is closed.
  */
 type HeaderActionsProps = {
   /** Search entry. Requires a surrounding SearchProvider. */
@@ -53,6 +57,13 @@ export function HeaderActions(props: HeaderActionsProps) {
   const user = useAuthStore((s) => s.auth.user)
   const { loading } = useSystemConfig()
   const notifications = useNotifications()
+  const { status } = useStatus()
+  // Fail closed while the registration status is unavailable: only show
+  // Sign up once the status request has resolved with registration open.
+  const registerEnabled =
+    status !== null &&
+    !status.self_use_mode_enabled &&
+    status.register_enabled !== false
 
   let authEntry: React.ReactNode = null
   if (props.showAuth) {
@@ -62,13 +73,25 @@ export function HeaderActions(props: HeaderActionsProps) {
       authEntry = <ProfileDropdown />
     } else {
       authEntry = (
-        <Button
-          size='sm'
-          className='h-8 rounded-lg px-3.5 text-xs font-medium'
-          render={<Link to='/sign-in' />}
-        >
-          {t('Sign in')}
-        </Button>
+        <>
+          <Button
+            size='sm'
+            className='h-8 rounded-lg px-3.5 text-xs font-medium'
+            render={<Link to='/sign-in' />}
+          >
+            {t('Sign in')}
+          </Button>
+          {registerEnabled && (
+            <Button
+              variant='outline'
+              size='sm'
+              className='border-foreground/35 hover:bg-muted/60 dark:border-foreground/30 h-8 rounded-lg bg-transparent px-3.5 text-xs font-medium dark:bg-transparent'
+              render={<Link to='/sign-up' />}
+            >
+              {t('Sign up')}
+            </Button>
+          )}
+        </>
       )
     }
   }

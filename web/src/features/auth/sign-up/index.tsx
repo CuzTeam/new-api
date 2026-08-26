@@ -32,21 +32,17 @@ export function SignUp() {
   return (
     <AuthLayout>
       <div className='w-full space-y-8'>
-        <div className='space-y-2'>
-          <h2 className='text-center text-2xl font-semibold tracking-tight sm:text-left'>
-            {t('Create an account')}
-          </h2>
-          <p className='text-muted-foreground text-left text-sm sm:text-base'>
-            {t('Already have an account?')}{' '}
-            <Link
-              to='/sign-in'
-              className='hover:text-primary font-medium underline underline-offset-4'
-            >
-              {t('Sign in')}
-            </Link>
-            .
-          </p>
-        </div>
+        {/* Title doubles as the switch between the two auth pages; both words
+            live in the same heading so their type can never drift apart. */}
+        <h2 className='flex items-baseline justify-center gap-5 text-2xl font-semibold tracking-tight sm:justify-start'>
+          <span>{t('Sign up')}</span>
+          <Link
+            to='/sign-in'
+            className='text-muted-foreground hover:text-foreground transition-colors'
+          >
+            {t('Sign in')}
+          </Link>
+        </h2>
 
         <SignUpForm />
 

@@ -19,6 +19,7 @@ import { Component, useMemo, useState, type ReactNode } from 'react'
 import { GrainGradient } from '@paper-design/shaders-react'
 
 import { useTheme } from '@/context/theme-provider'
+import { cn } from '@/lib/utils'
 
 /**
  * Static glow used when WebGL is unavailable — keeps the showcase card
@@ -74,13 +75,18 @@ function isWebGLAvailable(): boolean {
   }
 }
 
+interface GrainFieldProps {
+  /** Merged onto the absolutely-positioned wrapper — opacity, masks, insets. */
+  className?: string
+}
+
 /**
- * Grainy gradient backdrop for the showcase card.
+ * Grainy gradient backdrop, absolutely filling its nearest positioned parent.
  * Colors adapt to the current theme (light/dark).
  * Animation freezes for users who prefer reduced motion;
  * missing WebGL falls back to a static glow.
  */
-export function GrainField() {
+export function GrainField({ className }: GrainFieldProps) {
   const [supported] = useState(isWebGLAvailable)
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
@@ -90,27 +96,35 @@ export function GrainField() {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches
   }, [])
 
-  if (!supported) {
-    return <GlowFallback />
-  }
-
   return (
     <div
       aria-hidden
-      className='pointer-events-none absolute inset-0 opacity-60'
+      className={cn(
+        'pointer-events-none absolute inset-0 opacity-60',
+        className
+      )}
     >
-      <ShaderBoundary>
-        <GrainGradient
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-          colors={isDark ? ['#7300ff', '#eba8ff'] : ['#7300ff', '#c9a0ff']}
-          colorBack={isDark ? '#0a0a0a' : '#f8f8f8'}
-          softness={0.5}
-          intensity={0.5}
-          noise={0.25}
-          shape='corners'
-          speed={reducedMotion ? 0 : 0.2}
-        />
-      </ShaderBoundary>
+      {supported ? (
+        <ShaderBoundary>
+          <GrainGradient
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+            }}
+            colors={isDark ? ['#7300ff', '#eba8ff'] : ['#7300ff', '#c9a0ff']}
+            colorBack={isDark ? '#0a0a0a' : '#f8f8f8'}
+            softness={0.5}
+            intensity={0.5}
+            noise={0.25}
+            shape='corners'
+            speed={reducedMotion ? 0 : 0.2}
+          />
+        </ShaderBoundary>
+      ) : (
+        <GlowFallback />
+      )}
     </div>
   )
 }

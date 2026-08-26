@@ -4270,6 +4270,8 @@
     "Show sensitive data": "機密データを表示",
     "Show setup guide": "セットアップガイドを表示",
     "Show source": "ソースを表示",
+    "Show the API example": "API の例を表示",
+    "Show the routing diagram": "ルーティング図を表示",
     "Show token usage statistics in the UI": "UIでトークン使用統計を表示",
     "Showcase core capabilities with demo credentials and limited access.": "デモ用の認証情報と制限付きアクセスでコア機能を紹介します。",
     "Showing": "表示",

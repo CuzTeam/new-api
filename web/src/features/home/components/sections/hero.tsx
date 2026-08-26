@@ -24,7 +24,8 @@ import { useTranslation } from 'react-i18next'
 import { useStatus } from '@/hooks/use-status'
 
 import { FlipWords } from '../flip-words'
-import { HubDiagram } from '../hub-diagram'
+import { GrainField } from '../grain-field'
+import { HubFlipCard } from '../hub-flip-card'
 
 interface HeroProps {
   className?: string
@@ -32,8 +33,8 @@ interface HeroProps {
 }
 
 /**
- * Editorial hero: oversized left-aligned display type, no background art.
- * The visual focus lives in the inverted showcase card below instead.
+ * Editorial hero: oversized left-aligned display type over a full-bleed grainy
+ * purple field, with the two-faced routing card holding the right column.
  */
 export function Hero(props: HeroProps) {
   const { t } = useTranslation()
@@ -43,8 +44,9 @@ export function Hero(props: HeroProps) {
   const docsIsExternal = docsUrl.startsWith('http')
 
   return (
-    <section className='flex min-h-[calc(100svh-var(--app-header-height,3rem))] flex-col justify-center px-6'>
-      <div className='mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-10'>
+    <section className='relative flex min-h-[calc(100svh-var(--app-header-height,3rem))] flex-col justify-center overflow-hidden px-6'>
+      <GrainField className='opacity-45 [mask-image:linear-gradient(to_bottom,black_55%,transparent)]' />
+      <div className='relative mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-10'>
         <div className='max-w-3xl'>
           <p
             className='landing-animate-fade-up text-muted-foreground font-misans-regular text-xs font-medium tracking-[0.2em] uppercase opacity-0'
@@ -127,7 +129,7 @@ export function Hero(props: HeroProps) {
             )}
           </div>
         </div>
-        <HubDiagram className='hidden lg:block' />
+        <HubFlipCard className='hidden lg:block' />
       </div>
     </section>
   )

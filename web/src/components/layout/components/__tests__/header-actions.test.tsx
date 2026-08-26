@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { render, screen } from '@testing-library/react'
-import { describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test } from 'vitest'
 
 const { QueryClient, QueryClientProvider } =
   await import('@tanstack/react-query')
@@ -27,6 +27,16 @@ const { SearchProvider } = await import('@/context/search-provider')
 const { ThemeProvider } = await import('@/context/theme-provider')
 const { useSystemConfigStore } = await import('@/stores/system-config-store')
 const { HeaderActions } = await import('../header-actions')
+
+const STATUS_STORAGE_KEY = 'status'
+
+function seedStatus(status: unknown) {
+  window.localStorage.setItem(STATUS_STORAGE_KEY, JSON.stringify(status))
+}
+
+afterEach(() => {
+  window.localStorage.removeItem(STATUS_STORAGE_KEY)
+})
 
 type Overrides = Partial<{
   showSearch: boolean
@@ -79,6 +89,34 @@ function actionNames() {
 
 describe('header actions group', () => {
   test('renders every action in the fixed global order', async () => {
+    seedStatus({ register_enabled: true, self_use_mode_enabled: false })
+    renderHeaderActions()
+
+    await screen.findByRole('button', { name: 'Search' })
+    expect(actionNames()).toEqual([
+      'Search',
+      'Notifications',
+      'Change language',
+      'Toggle theme: System',
+      'Sign in',
+      'Sign up',
+    ])
+  })
+
+  test('omits disabled entries without changing the remaining order', async () => {
+    seedStatus({ register_enabled: true, self_use_mode_enabled: false })
+    renderHeaderActions({ showSearch: false, showNotifications: false })
+
+    await screen.findByRole('button', { name: 'Change language' })
+    expect(actionNames()).toEqual([
+      'Change language',
+      'Toggle theme: System',
+      'Sign in',
+      'Sign up',
+    ])
+  })
+
+  test('hides Sign up while the registration status is unavailable', async () => {
     renderHeaderActions()
 
     await screen.findByRole('button', { name: 'Search' })
@@ -91,11 +129,14 @@ describe('header actions group', () => {
     ])
   })
 
-  test('omits disabled entries without changing the remaining order', async () => {
-    renderHeaderActions({ showSearch: false, showNotifications: false })
+  test('hides Sign up when registration is disabled', async () => {
+    seedStatus({ register_enabled: false })
+    renderHeaderActions()
 
-    await screen.findByRole('button', { name: 'Change language' })
+    await screen.findByRole('button', { name: 'Search' })
     expect(actionNames()).toEqual([
+      'Search',
+      'Notifications',
       'Change language',
       'Toggle theme: System',
       'Sign in',
