@@ -48,7 +48,8 @@
   <a href="#-key-features">Key Features</a> •
   <a href="#-deployment">Deployment</a> •
   <a href="#-documentation">Documentation</a> •
-  <a href="#-help-support">Help</a>
+  <a href="#-help-support">Help</a> •
+  <a href="https://linux.do">Linux.do</a>
 </p>
 
 </div>
