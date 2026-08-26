@@ -54,21 +54,19 @@ export function Hero(props: HeroProps) {
           </p>
 
           <h1
-            className='landing-animate-fade-up font-misans mt-6 text-4xl font-medium tracking-tight text-balance opacity-0 sm:text-5xl lg:text-6xl'
+            className='landing-animate-fade-up font-misans mt-6 text-3xl font-medium tracking-tight opacity-0 sm:text-4xl lg:text-5xl'
             style={{ animationDelay: '60ms' }}
           >
-            {t('Unified API Gateway for')}
-            <span className='block mt-4'>
-              <FlipWords
-                className='text-[#7300ff] dark:text-[#cf9fff]'
-                words={[
-                  t('Every AI Model.'),
-                  t('40+ Providers.'),
-                  t('Claude, GPT & More.'),
-                  t('Your Entire LLM Stack.'),
-                ]}
-              />
-            </span>
+            {t('Unified API Gateway for')}{' '}
+            <FlipWords
+              className='text-[#7300ff] dark:text-[#cf9fff]'
+              words={[
+                t('Every AI Model.'),
+                t('40+ Providers.'),
+                t('Claude, GPT & More.'),
+                t('Your Entire LLM Stack.'),
+              ]}
+            />
           </h1>
 
           <p
