@@ -4210,6 +4210,7 @@
     "Separate image/audio prices are enabled.": "Separate image/audio prices are enabled.",
     "Separate multiple rules with English commas. For regex patterns that need commas, switch to JSON Text.": "Separate multiple rules with English commas. For regex patterns that need commas, switch to JSON Text.",
     "Serve multiple users or teams with billing and quota control.": "Serve multiple users or teams with billing and quota control.",
+    "Serving": "Serving",
     "Server Address": "Server Address",
     "Server IP": "Server IP",
     "Server Log Management": "Server Log Management",
