@@ -57,7 +57,8 @@ export function Hero(props: HeroProps) {
             className='landing-animate-fade-up font-misans mt-8 text-4xl font-medium tracking-tight opacity-0 sm:text-5xl lg:text-6xl'
             style={{ animationDelay: '60ms' }}
           >
-            {t('Unified API Gateway for')}{' '}
+            {t('Unified API Gateway for')}
+            <span className='block h-4' />
             <FlipWords
               className='text-[#7300ff] dark:text-[#cf9fff]'
               words={[
