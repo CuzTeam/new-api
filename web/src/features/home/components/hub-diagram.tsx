@@ -28,7 +28,7 @@ const LLM_ICONS = [
   'Grok',
   'Mistral.Color',
   'Meta.Color',
-  'Kimi.Color',
+  'Kimi.Mono',
   'Doubao.Color',
   'Minimax.Color',
 ] as const
@@ -66,7 +66,7 @@ export function HubDiagram({ className }: HubDiagramProps) {
     <div
       aria-hidden='true'
       className={cn(
-        'relative overflow-hidden rounded-[2rem] bg-muted/50 shadow-xl ring-1 ring-border',
+        'relative overflow-hidden rounded-[2rem] bg-muted/50',
         className
       )}
     >
