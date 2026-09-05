@@ -62,6 +62,9 @@
 > - Users should ensure their use complies with upstream terms of service and applicable laws and regulations.
 > - When providing generative AI services to the public, users should comply with applicable regulatory requirements and fulfill all filing, licensing, content safety, real-name verification, log retention, tax, and upstream authorization obligations required by their jurisdiction.
 
+> [!WARNING]
+> [@lonely-4](https://github.com/lonely-4) 开学，故维护时间延长到1w至少一次。
+
 ---
 
 ## 🤝 Trusted Partners
