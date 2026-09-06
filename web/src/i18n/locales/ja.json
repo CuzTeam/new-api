@@ -1748,6 +1748,7 @@
     "Enter a positive integer": "正の整数を入力してください",
     "Enter a positive or negative amount to adjust the quota": "クォータを調整するために正または負の値を入力してください",
     "Enter a react-icons component name. Invalid names show no icon.": "react-icons のコンポーネント名を入力してください。無効な名前はアイコンを表示しません。",
+    "Enter a service fee between 0 and 100": "0〜100 のサービス料金を入力してください",
     "Enter a valid email or leave blank": "有効なメールアドレスを入力するか空白にしてください",
     "Enter a value and press Enter": "値を入力してEnterを押してください",
     "Enter amount in {{currency}}": "{{currency}}で金額を入力",

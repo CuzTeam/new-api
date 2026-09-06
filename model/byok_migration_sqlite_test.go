@@ -26,6 +26,13 @@ func TestByokMigrationSQLiteIdempotent(t *testing.T) {
 	require.NoError(t, err)
 	common.SQLitePath = filepath.Join(dirForCleanup, "byok-test.db") + "?_pragma=busy_timeout(30000)"
 
+	// Pin the backend: InitDB chooses MySQL/PostgreSQL whenever SQL_DSN is
+	// set, which would silently skip the SQLite migration under test.
+	oldDSN := os.Getenv("SQL_DSN")
+	oldLogDSN := os.Getenv("LOG_SQL_DSN")
+	require.NoError(t, os.Setenv("SQL_DSN", ""))
+	require.NoError(t, os.Setenv("LOG_SQL_DSN", ""))
+
 	closeActivePool := func() {
 		if DB != nil {
 			if sqlDB, err := DB.DB(); err == nil {
@@ -44,6 +51,8 @@ func TestByokMigrationSQLiteIdempotent(t *testing.T) {
 		common.SetDatabaseTypes(oldMainType, oldLogType)
 		common.IsMasterNode = oldMaster
 		initCol()
+		_ = os.Setenv("SQL_DSN", oldDSN)
+		_ = os.Setenv("LOG_SQL_DSN", oldLogDSN)
 		_ = os.RemoveAll(dirForCleanup)
 	})
 

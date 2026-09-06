@@ -1748,6 +1748,7 @@
     "Enter a positive integer": "請輸入正整數",
     "Enter a positive or negative amount to adjust the quota": "輸入正數或負數以調整配額",
     "Enter a react-icons component name. Invalid names show no icon.": "輸入 react-icons 組件名。無法解析的名稱不會顯示圖標。",
+    "Enter a service fee between 0 and 100": "請輸入 0 到 100 之間的服務費",
     "Enter a valid email or leave blank": "請輸入有效的電郵地址或留空",
     "Enter a value and press Enter": "輸入值並按 Enter 鍵",
     "Enter amount in {{currency}}": "輸入金額（{{currency}}）",

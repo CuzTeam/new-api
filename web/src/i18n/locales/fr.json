@@ -1748,6 +1748,7 @@
     "Enter a positive integer": "Saisissez un entier positif",
     "Enter a positive or negative amount to adjust the quota": "Saisir un montant positif ou négatif pour ajuster le quota",
     "Enter a react-icons component name. Invalid names show no icon.": "Saisissez le nom d’un composant react-icons. Les noms invalides n’affichent aucune icône.",
+    "Enter a service fee between 0 and 100": "Saisissez des frais de service entre 0 et 100",
     "Enter a valid email or leave blank": "Entrez un e-mail valide ou laissez vide",
     "Enter a value and press Enter": "Saisir une valeur et appuyer sur Entrée",
     "Enter amount in {{currency}}": "Entrez le montant en {{currency}}",

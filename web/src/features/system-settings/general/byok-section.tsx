@@ -43,6 +43,7 @@ import { SettingsSection } from '../components/settings-section'
 import { useResetForm } from '../hooks/use-reset-form'
 import { useUpdateOption } from '../hooks/use-update-option'
 
+// The error string doubles as an i18n key; FormMessage wraps it with t().
 const byokSchema = z.object({
   ByokEnabled: z.boolean(),
   ByokServiceFeeUSD: z
@@ -153,7 +154,11 @@ export function ByokSection({ defaultValues }: ByokSectionProps) {
                     'Flat fee charged per request served by a user key. Set 0 to make BYOK free'
                   )}
                 </FormDescription>
-                <FormMessage />
+                <FormMessage>
+                  {form.formState.errors.ByokServiceFeeUSD?.message
+                    ? t(form.formState.errors.ByokServiceFeeUSD.message)
+                    : undefined}
+                </FormMessage>
               </FormItem>
             )}
           />

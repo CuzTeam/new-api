@@ -1748,6 +1748,7 @@
     "Enter a positive integer": "Nhập một số nguyên dương",
     "Enter a positive or negative amount to adjust the quota": "Nhập một giá trị dương hoặc âm để điều chỉnh hạn ngạch",
     "Enter a react-icons component name. Invalid names show no icon.": "Nhập tên component react-icons. Tên không hợp lệ sẽ không hiển thị biểu tượng.",
+    "Enter a service fee between 0 and 100": "Nhập phí dịch vụ từ 0 đến 100",
     "Enter a valid email or leave blank": "Nhập email hợp lệ hoặc để trống",
     "Enter a value and press Enter": "Nhập giá trị và nhấn Enter",
     "Enter amount in {{currency}}": "Nhập số tiền bằng {{currency}}",
