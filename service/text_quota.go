@@ -146,6 +146,12 @@ func mergeToolSurchargeItems(items []ToolSurchargeItem) []ToolSurchargeItem {
 }
 
 func calculateTextToolCallSurcharge(ctx *gin.Context, relayInfo *relaycommon.RelayInfo, summary *textQuotaSummary) decimal.Decimal {
+	// BYOK requests bill the flat per-request service fee only; tool calls run
+	// on the user's own upstream credential and carry no platform surcharge.
+	if common.GetContextKeyInt(ctx, constant.ContextKeyByokKeyId) > 0 {
+		summary.ToolSurchargeItems = nil
+		return decimal.Zero
+	}
 	dGroupRatio := decimal.NewFromFloat(summary.GroupRatio)
 	dQuotaPerUnit := decimal.NewFromFloat(common.QuotaPerUnit)
 

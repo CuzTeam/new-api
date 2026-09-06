@@ -14,7 +14,7 @@ import (
 // mode for modelName. Returns nil whenever BYOK is globally disabled, the user
 // has no matching key, or lookup fails (fail-open to normal channel routing).
 func SelectUserByokKeyForRequest(c *gin.Context, modelName string, mode string) *model.UserByokKey {
-	if c == nil || !byok_setting.Enabled {
+	if c == nil || !byok_setting.IsEnabled() {
 		return nil
 	}
 	userId := common.GetContextKeyInt(c, constant.ContextKeyUserId)

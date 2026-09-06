@@ -45,7 +45,13 @@ import { useUpdateOption } from '../hooks/use-update-option'
 
 const byokSchema = z.object({
   ByokEnabled: z.boolean(),
-  ByokServiceFeeUSD: z.string(),
+  ByokServiceFeeUSD: z
+    .string()
+    .trim()
+    .refine((value) => {
+      const fee = Number(value)
+      return value !== '' && Number.isFinite(fee) && fee >= 0 && fee <= 100
+    }, { error: 'Enter a service fee between 0 and 100' }),
 })
 
 type ByokFormValues = z.infer<typeof byokSchema>
@@ -66,15 +72,33 @@ export function ByokSection({ defaultValues }: ByokSectionProps) {
   useResetForm(form, defaultValues)
 
   const onSubmit = async (data: ByokFormValues) => {
-    const updates: Array<[string, string]> = []
-    if (data.ByokEnabled !== defaultValues.ByokEnabled) {
-      updates.push(['ByokEnabled', String(data.ByokEnabled)])
-    }
-    if (data.ByokServiceFeeUSD !== defaultValues.ByokServiceFeeUSD) {
-      updates.push(['ByokServiceFeeUSD', data.ByokServiceFeeUSD])
-    }
-    for (const [key, value] of updates) {
-      await updateOption.mutateAsync({ key, value })
+    const enableChanged = data.ByokEnabled !== defaultValues.ByokEnabled
+    const feeChanged = data.ByokServiceFeeUSD !== defaultValues.ByokServiceFeeUSD
+
+    // Order the paired writes so no intermediate state lets requests bypass
+    // the service fee: persist the fee before enabling BYOK, and disable
+    // BYOK before changing the fee.
+    if (enableChanged && data.ByokEnabled) {
+      if (feeChanged) {
+        await updateOption.mutateAsync({
+          key: 'ByokServiceFeeUSD',
+          value: data.ByokServiceFeeUSD,
+        })
+      }
+      await updateOption.mutateAsync({ key: 'ByokEnabled', value: 'true' })
+    } else if (enableChanged) {
+      await updateOption.mutateAsync({ key: 'ByokEnabled', value: 'false' })
+      if (feeChanged) {
+        await updateOption.mutateAsync({
+          key: 'ByokServiceFeeUSD',
+          value: data.ByokServiceFeeUSD,
+        })
+      }
+    } else if (feeChanged) {
+      await updateOption.mutateAsync({
+        key: 'ByokServiceFeeUSD',
+        value: data.ByokServiceFeeUSD,
+      })
     }
   }
 

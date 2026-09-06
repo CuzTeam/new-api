@@ -660,13 +660,13 @@ func TestModelPriceHelperNativeGeminiNoThinkingDoesNotAliasBillingModel(t *testi
 func TestModelPriceHelperByokUsesFlatServiceFee(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	oldFee := byok_setting.ServiceFeeUSD
-	t.Cleanup(func() { byok_setting.ServiceFeeUSD = oldFee })
+	oldFee := byok_setting.GetServiceFeeUSD()
+	t.Cleanup(func() { byok_setting.SetServiceFeeUSD(oldFee) })
 
 	// Unpriced model: BYOK must bypass the model-not-configured error entirely.
 	zeroCtx, _ := gin.CreateTestContext(httptest.NewRecorder())
 	common.SetContextKey(zeroCtx, constant.ContextKeyByokKeyId, 7)
-	byok_setting.ServiceFeeUSD = 0
+	byok_setting.SetServiceFeeUSD(0)
 
 	zeroInfo := &relaycommon.RelayInfo{OriginModelName: "byok-unpriced-model"}
 	zeroPrice, err := ModelPriceHelper(zeroCtx, zeroInfo, 1000, &types.TokenCountMeta{})
@@ -680,7 +680,7 @@ func TestModelPriceHelperByokUsesFlatServiceFee(t *testing.T) {
 	// Paid service fee: flat per-request conversion with no group scaling.
 	feeCtx, _ := gin.CreateTestContext(httptest.NewRecorder())
 	common.SetContextKey(feeCtx, constant.ContextKeyByokKeyId, 7)
-	byok_setting.ServiceFeeUSD = 0.5
+	byok_setting.SetServiceFeeUSD(0.5)
 
 	feeInfo := &relaycommon.RelayInfo{OriginModelName: "byok-unpriced-model"}
 	feePrice, err := ModelPriceHelper(feeCtx, feeInfo, 1000, &types.TokenCountMeta{})

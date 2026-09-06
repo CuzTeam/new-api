@@ -581,8 +581,8 @@ export const STATIC_I18N_KEYS = [
   'Verification scope is missing',
 
   // BYOK (constants-driven labels)
-  'Prioritized',
-  'Fallback',
+  'BYOK Prioritized',
+  'BYOK Fallback',
   'All of this provider',
   'BYOK key created',
   'BYOK key updated',

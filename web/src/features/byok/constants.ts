@@ -37,9 +37,11 @@ export const BYOK_CHANNEL_TYPE_OPTIONS = [
 export const BYOK_MODE_PRIORITIZED = 'prioritized'
 export const BYOK_MODE_FALLBACK = 'fallback'
 
+// Dedicated BYOK keys so the bare "Prioritized"/"Fallback" translations used
+// by other dialogs stay untouched.
 export const BYOK_MODE_OPTIONS = [
-  { value: BYOK_MODE_PRIORITIZED, labelKey: 'Prioritized' },
-  { value: BYOK_MODE_FALLBACK, labelKey: 'Fallback' },
+  { value: BYOK_MODE_PRIORITIZED, labelKey: 'BYOK Prioritized' },
+  { value: BYOK_MODE_FALLBACK, labelKey: 'BYOK Fallback' },
 ] as const
 
 export const BYOK_STATUS_OPTIONS = [

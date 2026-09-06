@@ -34,7 +34,7 @@ func buildByokKeyResponse(key *model.UserByokKey) *byokKeyResponse {
 // so the page can explain why binding or activation is unavailable.
 func GetByokStatus(c *gin.Context) {
 	common.ApiSuccess(c, gin.H{
-		"enabled":         byok_setting.Enabled,
+		"enabled":         byok_setting.IsEnabled(),
 		"service_fee_usd": byok_setting.GetServiceFeeUSD(),
 		"supported_types": model.ByokSupportedChannelTypes(),
 	})
@@ -73,7 +73,11 @@ func CreateUserByokKey(c *gin.Context) {
 		Status:      model.ByokKeyStatusEnabled,
 		CreatedTime: time.Now().Unix(),
 	}
-	if err := model.ValidateUserByokKey(key, req.Key); err != nil {
+	if err := model.ValidateUserByokKey(key); err != nil {
+		common.ApiError(c, err)
+		return
+	}
+	if err := model.ValidateByokPlaintextKey(req.Key); err != nil {
 		common.ApiError(c, err)
 		return
 	}
@@ -129,7 +133,7 @@ func UpdateUserByokKey(c *gin.Context) {
 		status = *req.Status
 	}
 	existing.Status = status
-	if err := model.ValidateUserByokKey(existing, req.Key); err != nil {
+	if err := model.ValidateUserByokKey(existing); err != nil {
 		common.ApiError(c, err)
 		return
 	}
@@ -138,6 +142,10 @@ func UpdateUserByokKey(c *gin.Context) {
 		return
 	}
 	if req.Key != "" {
+		if err := model.ValidateByokPlaintextKey(req.Key); err != nil {
+			common.ApiError(c, err)
+			return
+		}
 		ciphertext, encErr := common.EncryptSecret(req.Key)
 		if encErr != nil {
 			common.ApiError(c, encErr)

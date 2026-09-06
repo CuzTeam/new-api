@@ -72,6 +72,9 @@ func SetupContextForByokKey(c *gin.Context, key *model.UserByokKey) error {
 	common.SetContextKey(c, constant.ContextKeyChannelOtherSetting, relaykitdto.ChannelOtherSettings{})
 	common.SetContextKey(c, constant.ContextKeyByokKeyId, key.Id)
 	common.SetContextKey(c, constant.ContextKeyByokMode, key.Mode)
+	// Credential fingerprint: async failure handling must only disable the
+	// exact ciphertext that served this attempt, never a rotated one.
+	common.SetContextKey(c, constant.ContextKeyByokKeyCipher, key.KeyCiphertext)
 	return nil
 }
 
@@ -86,4 +89,5 @@ func ByokAttemptActive(c *gin.Context) bool {
 func ClearByokContext(c *gin.Context) {
 	common.SetContextKey(c, constant.ContextKeyByokKeyId, 0)
 	common.SetContextKey(c, constant.ContextKeyByokMode, "")
+	common.SetContextKey(c, constant.ContextKeyByokKeyCipher, "")
 }

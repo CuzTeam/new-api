@@ -75,15 +75,19 @@ func TestUserByokKeySetModelListNormalizesAndDeduplicates(t *testing.T) {
 
 func TestValidateUserByokKey(t *testing.T) {
 	valid := &UserByokKey{ChannelType: constant.ChannelTypeOpenAI, Mode: ByokModePrioritized}
-	require.NoError(t, ValidateUserByokKey(valid, "sk-abc"))
+	require.NoError(t, ValidateUserByokKey(valid))
+	require.NoError(t, ValidateByokPlaintextKey("sk-abc"))
 
 	unsupported := &UserByokKey{ChannelType: constant.ChannelTypeAzure, Mode: ByokModePrioritized}
-	require.Error(t, ValidateUserByokKey(unsupported, "sk-abc"))
+	require.Error(t, ValidateUserByokKey(unsupported))
 
 	badMode := &UserByokKey{ChannelType: constant.ChannelTypeOpenAI, Mode: "whatever"}
-	require.Error(t, ValidateUserByokKey(badMode, "sk-abc"))
+	require.Error(t, ValidateUserByokKey(badMode))
 
-	require.Error(t, ValidateUserByokKey(valid, "   "))
+	// Metadata-only updates skip plaintext validation entirely; when a key IS
+	// submitted, both empty and whitespace-only values are rejected.
+	require.Error(t, ValidateByokPlaintextKey(""))
+	require.Error(t, ValidateByokPlaintextKey("   "))
 }
 
 func TestMaskByokKeyKeepsOnlySuffix(t *testing.T) {

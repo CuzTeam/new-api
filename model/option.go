@@ -187,8 +187,8 @@ func InitOptionMap() {
 	common.OptionMap["AutomaticDisableStatusCodes"] = operation_setting.AutomaticDisableStatusCodesToString()
 	common.OptionMap["AutomaticRetryStatusCodes"] = operation_setting.AutomaticRetryStatusCodesToString()
 	common.OptionMap["ExposeRatioEnabled"] = strconv.FormatBool(ratio_setting.IsExposeRatioEnabled())
-	common.OptionMap[byok_setting.ByokEnabledKey] = strconv.FormatBool(byok_setting.Enabled)
-	common.OptionMap[byok_setting.ByokServiceFeeKey] = strconv.FormatFloat(byok_setting.ServiceFeeUSD, 'f', -1, 64)
+	common.OptionMap[byok_setting.ByokEnabledKey] = strconv.FormatBool(byok_setting.IsEnabled())
+	common.OptionMap[byok_setting.ByokServiceFeeKey] = strconv.FormatFloat(byok_setting.GetServiceFeeUSD(), 'f', -1, 64)
 
 	// 自动添加所有注册的模型配置
 	modelConfigs := config.GlobalConfig.ExportAllConfigs()
@@ -396,7 +396,7 @@ func updateOptionMap(key string, value string) (err error) {
 		case "ModelRequestRateLimitEnabled":
 			setting.ModelRequestRateLimitEnabled = boolValue
 		case byok_setting.ByokEnabledKey:
-			byok_setting.Enabled = boolValue
+			byok_setting.SetEnabled(boolValue)
 		case "StopOnSensitiveEnabled":
 			setting.StopOnSensitiveEnabled = boolValue
 		case "SMTPSSLEnabled":
@@ -457,8 +457,8 @@ func updateOptionMap(key string, value string) (err error) {
 	case "Price":
 		operation_setting.Price, _ = strconv.ParseFloat(value, 64)
 	case byok_setting.ByokServiceFeeKey:
-		if fee, parseErr := strconv.ParseFloat(value, 64); parseErr == nil && fee >= 0 && fee <= byok_setting.MaxServiceFeeUSD {
-			byok_setting.ServiceFeeUSD = fee
+		if fee, parseErr := strconv.ParseFloat(value, 64); parseErr == nil {
+			byok_setting.SetServiceFeeUSD(fee)
 		}
 	case "USDExchangeRate":
 		operation_setting.USDExchangeRate, _ = strconv.ParseFloat(value, 64)

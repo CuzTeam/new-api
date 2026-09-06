@@ -22,7 +22,19 @@ const byokCipherKeySize = 32
 // InitByokCipher loads or creates the symmetric key used to encrypt BYOK
 // credentials at rest. It runs unconditionally at startup so previously bound
 // keys stay decryptable regardless of the current BYOK feature toggle.
+//
+// Setting BYOK_CIPHER_KEY (base64, 32 bytes) injects a deployment-provided key
+// from the environment or a secret manager, keeping the wrapping key out of
+// the application database. Without it, a key is generated once and stored in
+// the dedicated login_encryption_keys slot.
 func InitByokCipher() error {
+	if envKey := common.GetEnvOrDefaultString("BYOK_CIPHER_KEY", ""); envKey != "" {
+		if err := loadByokCipherKey(envKey); err != nil {
+			return errors.New("BYOK_CIPHER_KEY is not a valid base64 32-byte key")
+		}
+		return nil
+	}
+
 	var stored LoginEncryptionKey
 	queryErr := DB.Where("slot = ?", byokCipherKeySlot).First(&stored).Error
 	if queryErr == nil {

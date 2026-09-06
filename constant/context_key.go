@@ -41,8 +41,9 @@ const (
 	ContextKeyChannelKey               ContextKey = "channel_key"
 
 	/* BYOK related keys */
-	ContextKeyByokKeyId ContextKey = "byok_key_id"
-	ContextKeyByokMode  ContextKey = "byok_mode"
+	ContextKeyByokKeyId     ContextKey = "byok_key_id"
+	ContextKeyByokMode      ContextKey = "byok_mode"
+	ContextKeyByokKeyCipher ContextKey = "byok_key_cipher"
 
 	ContextKeyAutoGroup           ContextKey = "auto_group"
 	ContextKeyAutoGroupIndex      ContextKey = "auto_group_index"

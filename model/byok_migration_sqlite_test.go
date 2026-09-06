@@ -81,6 +81,7 @@ func TestByokMigrationSQLiteIdempotent(t *testing.T) {
 	require.Equal(t, "sk-test-plaintext-1234", plaintext)
 
 	// Auto-disable path works on the migrated table.
-	require.True(t, DisableUserByokKey(keys[0].Id))
-	require.False(t, DisableUserByokKey(keys[0].Id)) // already disabled
+	require.True(t, DisableUserByokKey(keys[0].Id, keys[0].KeyCiphertext))
+	require.False(t, DisableUserByokKey(keys[0].Id, keys[0].KeyCiphertext)) // already disabled
+	require.False(t, DisableUserByokKey(keys[0].Id, "stale-ciphertext"))    // rotated credential
 }

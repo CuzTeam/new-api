@@ -59,6 +59,7 @@ export function Byok() {
   const {
     data: keysData,
     isLoading,
+    isError,
     refetch,
   } = useQuery({
     queryKey: ['byok-keys'],
@@ -118,6 +119,17 @@ export function Byok() {
     content = (
       <div className='flex justify-center py-12'>
         <Spinner />
+      </div>
+    )
+  } else if (isError) {
+    content = (
+      <div className='py-12 text-center'>
+        <p className='text-muted-foreground mb-4 text-sm'>
+          {t(ERROR_MESSAGES.LOAD_FAILED)}
+        </p>
+        <Button variant='outline' onClick={() => void refetch()}>
+          {t('Retry')}
+        </Button>
       </div>
     )
   } else if (keys.length === 0) {

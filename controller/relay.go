@@ -200,7 +200,7 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 		if channelErr != nil {
 			// Fallback mode: platform channels are unavailable or exhausted;
 			// give the user's own key exactly one attempt.
-			if !byokAttemptDone && activateByokFallback(c, relayInfo) {
+			if !byokAttemptDone && activateByokFallback(c, relayInfo, tokens, meta) {
 				byokAttemptDone = true
 				retryParam.SetRetry(-1)
 				continue
@@ -268,7 +268,7 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 		processChannelError(c, *types.NewChannelError(channel.Id, channel.Type, channel.Name, channel.ChannelInfo.IsMultiKey, common.GetContextKeyString(c, constant.ContextKeyChannelKey), channel.GetAutoBan()), newAPIError, relayInfo)
 
 		if !shouldRetry(c, newAPIError, common.RetryTimes-retryParam.GetRetry()) {
-			if !byokAttemptDone && activateByokFallback(c, relayInfo) {
+			if !byokAttemptDone && activateByokFallback(c, relayInfo, tokens, meta) {
 				byokAttemptDone = true
 				retryParam.SetRetry(-1)
 				continue
@@ -328,38 +328,53 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func addUsedChannel(c *gin.Context, channelId int) {
-	useChannel := c.GetStringSlice("use_channel")
-	useChannel = append(useChannel, fmt.Sprintf("%d", channelId))
-	c.Set("use_channel", useChannel)
-}
-
 // activateByokFallback gives the user's own key one attempt after platform
 // channels failed (or never existed). It is a no-op when BYOK is disabled,
-// the user has no fallback key, or a byok attempt already ran.
-func activateByokFallback(c *gin.Context, relayInfo *relaycommon.RelayInfo) bool {
+// the user has no fallback key, or a byok attempt already ran. On success the
+// request is re-priced to the flat byok service fee before the attempt.
+func activateByokFallback(c *gin.Context, relayInfo *relaycommon.RelayInfo, promptTokens int, meta *types.TokenCountMeta) bool {
 	if middleware.ByokAttemptActive(c) {
 		return false
 	}
-	return middleware.ActivateByokKeyForRequest(c, model.ByokModeFallback, relayInfo.OriginModelName)
+	if !middleware.ActivateByokKeyForRequest(c, model.ByokModeFallback, relayInfo.OriginModelName) {
+		return false
+	}
+	if _, err := helper.ModelPriceHelper(c, relayInfo, promptTokens, meta); err != nil {
+		// Re-pricing failed; fall back to normal routing with the existing
+		// billing state instead of silently serving a mispriced request.
+		logger.LogError(c, "byok fallback re-pricing failed: "+err.Error())
+		middleware.ClearByokContext(c)
+		return false
+	}
+	return true
 }
 
 // handleByokAttemptFailure records the failed byok attempt and auto-disables
-// the key when the upstream rejected the credential itself.
+// the key when the upstream rejected the credential itself. The ciphertext
+// fingerprint ensures a stale request can never disable a rotated or
+// re-enabled credential stored under the same key id.
 func handleByokAttemptFailure(c *gin.Context, byokErr *types.NewAPIError) {
 	keyId := common.GetContextKeyInt(c, constant.ContextKeyByokKeyId)
+	cipherFingerprint := common.GetContextKeyString(c, constant.ContextKeyByokKeyCipher)
 	logger.LogError(c, fmt.Sprintf("byok request failed (key #%d, mode %s): %s",
 		keyId,
 		common.GetContextKeyString(c, constant.ContextKeyByokMode),
 		common.LocalLogPreview(byokErr.Error())))
-	if keyId <= 0 || (byokErr.StatusCode != http.StatusUnauthorized && byokErr.StatusCode != http.StatusForbidden) {
+	if keyId <= 0 || cipherFingerprint == "" ||
+		(byokErr.StatusCode != http.StatusUnauthorized && byokErr.StatusCode != http.StatusForbidden) {
 		return
 	}
 	gopool.Go(func() {
-		if model.DisableUserByokKey(keyId) {
+		if model.DisableUserByokKey(keyId, cipherFingerprint) {
 			common.SysLog(fmt.Sprintf("byok key #%d auto-disabled after upstream auth failure", keyId))
 		}
 	})
+}
+
+func addUsedChannel(c *gin.Context, channelId int) {
+	useChannel := c.GetStringSlice("use_channel")
+	useChannel = append(useChannel, fmt.Sprintf("%d", channelId))
+	c.Set("use_channel", useChannel)
 }
 
 // switchByokFailureToChannelBilling refunds the byok service-fee pre-consume,

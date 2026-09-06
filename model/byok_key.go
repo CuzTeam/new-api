@@ -128,7 +128,7 @@ func MaskByokKey(key string) string {
 	return "****" + key[len(key)-4:]
 }
 
-func ValidateUserByokKey(key *UserByokKey, plaintextKey string) error {
+func ValidateUserByokKey(key *UserByokKey) error {
 	if !ByokChannelTypeSupported(key.ChannelType) {
 		return errors.New("unsupported channel type for BYOK")
 	}
@@ -138,6 +138,12 @@ func ValidateUserByokKey(key *UserByokKey, plaintextKey string) error {
 	if len(key.Name) > maxByokKeyNameLength {
 		return errors.New("BYOK key name is too long")
 	}
+	return nil
+}
+
+// ValidateByokPlaintextKey checks a newly submitted plaintext credential.
+// Metadata-only updates skip this check.
+func ValidateByokPlaintextKey(plaintextKey string) error {
 	plaintextKey = strings.TrimSpace(plaintextKey)
 	if plaintextKey == "" {
 		return errors.New("BYOK key must not be empty")
@@ -184,10 +190,11 @@ func InsertUserByokKey(key *UserByokKey) error {
 // the struct replaces the stored credential (key rotation).
 func UpdateUserByokKey(userId int, key *UserByokKey) error {
 	updates := map[string]interface{}{
-		"name":       key.Name,
-		"mode":       key.Mode,
-		"model_list": key.ModelList,
-		"status":     key.Status,
+		"channel_type": key.ChannelType,
+		"name":         key.Name,
+		"mode":         key.Mode,
+		"model_list":   key.ModelList,
+		"status":       key.Status,
 	}
 	if key.KeyCiphertext != "" {
 		updates["key_ciphertext"] = key.KeyCiphertext
@@ -235,10 +242,15 @@ func SelectUserByokKey(userId int, modelName string, mode string) (*UserByokKey,
 }
 
 // DisableUserByokKey marks a key disabled (auto-disable on upstream auth
-// failure). Returns true when the key transitioned from enabled to disabled.
-func DisableUserByokKey(keyId int) bool {
+// failure). The ciphertext fingerprint guards against a stale in-flight
+// request disabling a credential that was rotated under the same id.
+// Returns true when the key transitioned from enabled to disabled.
+func DisableUserByokKey(keyId int, cipherFingerprint string) bool {
+	if keyId <= 0 || cipherFingerprint == "" {
+		return false
+	}
 	result := DB.Model(&UserByokKey{}).
-		Where("id = ? and status = ?", keyId, ByokKeyStatusEnabled).
+		Where("id = ? and status = ? and key_ciphertext = ?", keyId, ByokKeyStatusEnabled, cipherFingerprint).
 		Update("status", ByokKeyStatusDisabled)
 	return result.Error == nil && result.RowsAffected > 0
 }
