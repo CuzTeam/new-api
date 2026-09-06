@@ -10,22 +10,42 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestByokMigrationSQLiteIdempotent runs the full AutoMigrate twice against a
-// fresh SQLite database and asserts the byok tables are usable afterwards.
+// TestByokMigrationSQLiteIdempotent runs the full InitDB/migrateDB twice
+// against a fresh SQLite database and asserts the byok tables are usable
+// afterwards. It restores the package-level TestMain database on cleanup so
+// the rest of the package's tests keep using their shared :memory: store.
 func TestByokMigrationSQLiteIdempotent(t *testing.T) {
 	oldMaster := common.IsMasterNode
+	oldDB, oldLogDB := DB, LOG_DB
+	oldSQLitePath := common.SQLitePath
+	oldMainType := common.MainDatabaseType()
+	oldLogType := common.LogDatabaseType()
 	common.IsMasterNode = true
-	t.Cleanup(func() { common.IsMasterNode = oldMaster })
 
-	// Other tests in this package share the package-level DB handle, so this
-	// test never closes the pool. Use a self-managed temp dir and ignore the
-	// removal error (Windows keeps the SQLite file locked until exit).
-	dir, err := os.MkdirTemp("", "byok-mig-*")
+	dirForCleanup, err := os.MkdirTemp("", "byok-mig-*")
 	require.NoError(t, err)
+	common.SQLitePath = filepath.Join(dirForCleanup, "byok-test.db") + "?_pragma=busy_timeout(30000)"
+
+	closeActivePool := func() {
+		if DB != nil {
+			if sqlDB, err := DB.DB(); err == nil {
+				_ = sqlDB.Close()
+			}
+		}
+	}
 	t.Cleanup(func() {
-		_ = os.RemoveAll(dir)
+		// Close the pools this test created, then restore the TestMain
+		// environment. On Linux the temp SQLite file is already unlinked, so
+		// leaving the pools open would make a fresh pooled connection open an
+		// empty database for subsequent tests.
+		closeActivePool()
+		DB, LOG_DB = oldDB, oldLogDB
+		common.SQLitePath = oldSQLitePath
+		common.SetDatabaseTypes(oldMainType, oldLogType)
+		common.IsMasterNode = oldMaster
+		initCol()
+		_ = os.RemoveAll(dirForCleanup)
 	})
-	common.SQLitePath = filepath.Join(dir, "byok-test.db") + "?_pragma=busy_timeout(30000)"
 
 	require.NoError(t, InitDB())
 	require.NoError(t, InitByokCipher())
@@ -45,6 +65,7 @@ func TestByokMigrationSQLiteIdempotent(t *testing.T) {
 	require.NoError(t, InsertUserByokKey(key))
 
 	// Second startup: migration must be idempotent and data must survive.
+	closeActivePool()
 	require.NoError(t, InitDB())
 	require.NoError(t, InitByokCipher())
 
