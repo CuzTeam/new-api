@@ -30,6 +30,8 @@ const defaultOperationsSettings: OperationsSettings = {
   DefaultCollapseSidebar: false,
   DemoSiteEnabled: false,
   SelfUseModeEnabled: false,
+  ByokEnabled: false,
+  ByokServiceFeeUSD: '0',
   QuotaRemindThreshold: '',
   SMTPServer: '',
   SMTPPort: '',

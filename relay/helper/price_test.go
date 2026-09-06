@@ -6,11 +6,13 @@ import (
 	"testing"
 
 	"github.com/QuantumNous/new-api/common"
+	"github.com/QuantumNous/new-api/constant"
 	"github.com/QuantumNous/new-api/pkg/billingexpr"
 	relaycommon "github.com/QuantumNous/new-api/relay/common"
 	"github.com/QuantumNous/new-api/relaykit/dto"
 	"github.com/QuantumNous/new-api/relaykit/types"
 	"github.com/QuantumNous/new-api/setting/billing_setting"
+	"github.com/QuantumNous/new-api/setting/byok_setting"
 	"github.com/QuantumNous/new-api/setting/config"
 	"github.com/QuantumNous/new-api/setting/model_setting"
 	"github.com/QuantumNous/new-api/setting/operation_setting"
@@ -653,4 +655,40 @@ func TestModelPriceHelperNativeGeminiNoThinkingDoesNotAliasBillingModel(t *testi
 	assert.Equal(t, "gemini-3-pro", info.GetBillingModelName())
 	assert.Equal(t, 1.25, priceData.ModelRatio)
 	assert.NotEqual(t, 37.5, priceData.ModelRatio)
+}
+
+func TestModelPriceHelperByokUsesFlatServiceFee(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	oldFee := byok_setting.ServiceFeeUSD
+	t.Cleanup(func() { byok_setting.ServiceFeeUSD = oldFee })
+
+	// Unpriced model: BYOK must bypass the model-not-configured error entirely.
+	zeroCtx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	common.SetContextKey(zeroCtx, constant.ContextKeyByokKeyId, 7)
+	byok_setting.ServiceFeeUSD = 0
+
+	zeroInfo := &relaycommon.RelayInfo{OriginModelName: "byok-unpriced-model"}
+	zeroPrice, err := ModelPriceHelper(zeroCtx, zeroInfo, 1000, &types.TokenCountMeta{})
+	require.NoError(t, err)
+	assert.True(t, zeroPrice.UsePrice)
+	assert.True(t, zeroPrice.FreeModel)
+	assert.Equal(t, 0.0, zeroPrice.ModelPrice)
+	assert.Equal(t, 0, zeroPrice.QuotaToPreConsume)
+	assert.Equal(t, 1.0, zeroPrice.GroupRatioInfo.GroupRatio)
+
+	// Paid service fee: flat per-request conversion with no group scaling.
+	feeCtx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	common.SetContextKey(feeCtx, constant.ContextKeyByokKeyId, 7)
+	byok_setting.ServiceFeeUSD = 0.5
+
+	feeInfo := &relaycommon.RelayInfo{OriginModelName: "byok-unpriced-model"}
+	feePrice, err := ModelPriceHelper(feeCtx, feeInfo, 1000, &types.TokenCountMeta{})
+	require.NoError(t, err)
+	assert.True(t, feePrice.UsePrice)
+	assert.False(t, feePrice.FreeModel)
+	assert.Equal(t, 0.5, feePrice.ModelPrice)
+	assert.Equal(t, int(0.5*common.QuotaPerUnit), feePrice.QuotaToPreConsume)
+	assert.Equal(t, 1.0, feePrice.GroupRatioInfo.GroupRatio)
+	assert.Nil(t, feeInfo.TieredBillingSnapshot)
 }

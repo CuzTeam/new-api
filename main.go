@@ -324,6 +324,10 @@ func InitResources() error {
 			return err
 		}
 	}
+	if err = model.InitByokCipher(); err != nil {
+		common.FatalLog("failed to initialize byok cipher: " + err.Error())
+		return err
+	}
 
 	model.CheckSetup()
 

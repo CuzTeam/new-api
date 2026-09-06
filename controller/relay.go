@@ -193,15 +193,25 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 	relayInfo.RetryIndex = 0
 	relayInfo.LastError = nil
 
+	byokAttemptDone := false
 	for ; retryParam.GetRetry() <= common.RetryTimes; retryParam.IncreaseRetry() {
 		relayInfo.RetryIndex = retryParam.GetRetry()
 		channel, channelErr := getChannel(c, relayInfo, retryParam)
 		if channelErr != nil {
+			// Fallback mode: platform channels are unavailable or exhausted;
+			// give the user's own key exactly one attempt.
+			if !byokAttemptDone && activateByokFallback(c, relayInfo) {
+				byokAttemptDone = true
+				retryParam.SetRetry(-1)
+				continue
+			}
 			logger.LogError(c, channelErr.Error())
 			newAPIError = channelErr
 			break
 		}
-		addUsedChannel(c, channel.Id)
+		if channel.Id > 0 {
+			addUsedChannel(c, channel.Id)
+		}
 		if billingErr := service.PrepareTieredBillingForSelectedGroup(c, relayInfo); billingErr != nil {
 			newAPIError = billingErr
 			break
@@ -238,9 +248,31 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 		newAPIError = service.NormalizeViolationFeeError(newAPIError)
 		relayInfo.LastError = newAPIError
 
+		if middleware.ByokAttemptActive(c) {
+			byokAttemptDone = true
+			handleByokAttemptFailure(c, newAPIError)
+			if common.GetContextKeyString(c, constant.ContextKeyByokMode) == model.ByokModeFallback {
+				// The byok attempt was itself the last resort (platform channels
+				// already failed or never existed); surface the upstream error.
+				break
+			}
+			// Prioritized mode: hand the request back to platform channels with
+			// a fresh billing session and the full retry budget.
+			if !switchByokFailureToChannelBilling(c, relayInfo, tokens, meta) {
+				break
+			}
+			retryParam.SetRetry(-1)
+			continue
+		}
+
 		processChannelError(c, *types.NewChannelError(channel.Id, channel.Type, channel.Name, channel.ChannelInfo.IsMultiKey, common.GetContextKeyString(c, constant.ContextKeyChannelKey), channel.GetAutoBan()), newAPIError, relayInfo)
 
 		if !shouldRetry(c, newAPIError, common.RetryTimes-retryParam.GetRetry()) {
+			if !byokAttemptDone && activateByokFallback(c, relayInfo) {
+				byokAttemptDone = true
+				retryParam.SetRetry(-1)
+				continue
+			}
 			break
 		}
 	}
@@ -302,6 +334,59 @@ func addUsedChannel(c *gin.Context, channelId int) {
 	c.Set("use_channel", useChannel)
 }
 
+// activateByokFallback gives the user's own key one attempt after platform
+// channels failed (or never existed). It is a no-op when BYOK is disabled,
+// the user has no fallback key, or a byok attempt already ran.
+func activateByokFallback(c *gin.Context, relayInfo *relaycommon.RelayInfo) bool {
+	if middleware.ByokAttemptActive(c) {
+		return false
+	}
+	return middleware.ActivateByokKeyForRequest(c, model.ByokModeFallback, relayInfo.OriginModelName)
+}
+
+// handleByokAttemptFailure records the failed byok attempt and auto-disables
+// the key when the upstream rejected the credential itself.
+func handleByokAttemptFailure(c *gin.Context, byokErr *types.NewAPIError) {
+	keyId := common.GetContextKeyInt(c, constant.ContextKeyByokKeyId)
+	logger.LogError(c, fmt.Sprintf("byok request failed (key #%d, mode %s): %s",
+		keyId,
+		common.GetContextKeyString(c, constant.ContextKeyByokMode),
+		common.LocalLogPreview(byokErr.Error())))
+	if keyId <= 0 || (byokErr.StatusCode != http.StatusUnauthorized && byokErr.StatusCode != http.StatusForbidden) {
+		return
+	}
+	gopool.Go(func() {
+		if model.DisableUserByokKey(keyId) {
+			common.SysLog(fmt.Sprintf("byok key #%d auto-disabled after upstream auth failure", keyId))
+		}
+	})
+}
+
+// switchByokFailureToChannelBilling refunds the byok service-fee pre-consume,
+// clears the byok context and rebuilds a token-based billing session so the
+// remaining retries run against platform channels with correct pricing.
+// Returns false when channel billing cannot be prepared; the caller then keeps
+// the original byok error.
+func switchByokFailureToChannelBilling(c *gin.Context, relayInfo *relaycommon.RelayInfo, promptTokens int, meta *types.TokenCountMeta) bool {
+	if relayInfo.Billing != nil {
+		relayInfo.Billing.Refund(c)
+	}
+	relayInfo.Billing = nil
+	middleware.ClearByokContext(c)
+	priceData, err := helper.ModelPriceHelper(c, relayInfo, promptTokens, meta)
+	if err != nil {
+		logger.LogError(c, "byok fallback re-pricing failed: "+err.Error())
+		return false
+	}
+	if !priceData.FreeModel {
+		if billingErr := service.PreConsumeBilling(c, priceData.QuotaToPreConsume, relayInfo); billingErr != nil {
+			logger.LogError(c, "byok fallback pre-consume failed: "+billingErr.Error())
+			return false
+		}
+	}
+	return true
+}
+
 func fastTokenCountMetaForPricing(request dto.Request) *types.TokenCountMeta {
 	if request == nil {
 		return &types.TokenCountMeta{}
@@ -332,7 +417,7 @@ func fastTokenCountMetaForPricing(request dto.Request) *types.TokenCountMeta {
 }
 
 func getChannel(c *gin.Context, info *relaycommon.RelayInfo, retryParam *service.RetryParam) (*model.Channel, *types.NewAPIError) {
-	if info.ChannelMeta == nil {
+	if info.ChannelMeta == nil || middleware.ByokAttemptActive(c) {
 		autoBan := c.GetBool("auto_ban")
 		autoBanInt := 1
 		if !autoBan {

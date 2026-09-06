@@ -54,6 +54,22 @@ func GetEnabledModels() []string {
 	return models
 }
 
+// GetEnabledChannelTypesForModel returns the distinct channel types of enabled
+// channels that currently serve modelName in any group. Used by BYOK matching
+// to decide whether a user-supplied key of a provider type can serve a model.
+func GetEnabledChannelTypesForModel(modelName string) []int {
+	var channelTypes []int
+	err := DB.Table("abilities").
+		Select("DISTINCT channels.type").
+		Joins("left join channels on abilities.channel_id = channels.id").
+		Where("abilities.model = ? and abilities.enabled = ? and channels.status = ?", modelName, true, common.ChannelStatusEnabled).
+		Scan(&channelTypes).Error
+	if err != nil {
+		return nil
+	}
+	return channelTypes
+}
+
 func GetAllEnableAbilities() []Ability {
 	var abilities []Ability
 	DB.Find(&abilities, "enabled = ?", true)

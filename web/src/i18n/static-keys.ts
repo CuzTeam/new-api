@@ -579,4 +579,14 @@ export const STATIC_I18N_KEYS = [
   'This user account is disabled.',
   'Telegram binding failed. Please try again.',
   'Verification scope is missing',
+
+  // BYOK (constants-driven labels)
+  'Prioritized',
+  'Fallback',
+  'All of this provider',
+  'BYOK key created',
+  'BYOK key updated',
+  'BYOK key deleted',
+  'Unexpected error',
+  'Failed to load BYOK keys',
 ] as const

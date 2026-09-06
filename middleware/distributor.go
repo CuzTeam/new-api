@@ -103,6 +103,14 @@ func Distribute() func(c *gin.Context) {
 					abortWithOpenAiMessage(c, http.StatusBadRequest, i18n.T(c, i18n.MsgDistributorModelNameRequired))
 					return
 				}
+				// BYOK prioritized: a user-supplied key serves the request before
+				// any platform channel is considered. Skipped entirely when the
+				// global BYOK switch is off or the user has no matching key.
+				if ActivateByokKeyForRequest(c, model.ByokModePrioritized, modelRequest.Model) {
+					common.SetContextKey(c, constant.ContextKeyRequestStartTime, time.Now())
+					c.Next()
+					return
+				}
 				var selectGroup string
 				usingGroup := common.GetContextKeyString(c, constant.ContextKeyUsingGroup)
 				// check path is /pg/chat/completions
@@ -175,10 +183,21 @@ func Distribute() func(c *gin.Context) {
 						//	common.SysError(fmt.Sprintf("渠道不存在：%d", channel.Id))
 						//	message = "数据库一致性已被破坏，请联系管理员"
 						//}
+						// BYOK fallback: no selectable channel, give the user's own key a chance.
+						if ActivateByokKeyForRequest(c, model.ByokModeFallback, modelRequest.Model) {
+							common.SetContextKey(c, constant.ContextKeyRequestStartTime, time.Now())
+							c.Next()
+							return
+						}
 						abortWithOpenAiMessage(c, http.StatusServiceUnavailable, message, types.ErrorCodeModelNotFound)
 						return
 					}
 					if channel == nil {
+						if ActivateByokKeyForRequest(c, model.ByokModeFallback, modelRequest.Model) {
+							common.SetContextKey(c, constant.ContextKeyRequestStartTime, time.Now())
+							c.Next()
+							return
+						}
 						abortWithOpenAiMessage(c, http.StatusServiceUnavailable, noAvailableChannelMessage(c, usingGroup, modelRequest.Model), types.ErrorCodeModelNotFound)
 						return
 					}

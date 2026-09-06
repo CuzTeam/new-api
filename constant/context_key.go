@@ -40,6 +40,10 @@ const (
 	ContextKeyChannelMultiKeyIndex     ContextKey = "channel_multi_key_index"
 	ContextKeyChannelKey               ContextKey = "channel_key"
 
+	/* BYOK related keys */
+	ContextKeyByokKeyId ContextKey = "byok_key_id"
+	ContextKeyByokMode  ContextKey = "byok_mode"
+
 	ContextKeyAutoGroup           ContextKey = "auto_group"
 	ContextKeyAutoGroupIndex      ContextKey = "auto_group_index"
 	ContextKeyAutoGroupRetryIndex ContextKey = "auto_group_retry_index"

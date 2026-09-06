@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/QuantumNous/new-api/common"
+	"github.com/QuantumNous/new-api/constant"
 	"github.com/QuantumNous/new-api/logger"
 	"github.com/QuantumNous/new-api/model"
 	"github.com/QuantumNous/new-api/pkg/billingexpr"
@@ -12,6 +13,7 @@ import (
 	"github.com/QuantumNous/new-api/relaykit/relayconvert/reasoning"
 	"github.com/QuantumNous/new-api/relaykit/types"
 	"github.com/QuantumNous/new-api/setting/billing_setting"
+	"github.com/QuantumNous/new-api/setting/byok_setting"
 	"github.com/QuantumNous/new-api/setting/operation_setting"
 	"github.com/QuantumNous/new-api/setting/ratio_setting"
 	hostreasoning "github.com/QuantumNous/new-api/setting/reasoning"
@@ -72,8 +74,42 @@ func HandleGroupRatio(ctx *gin.Context, relayInfo *relaycommon.RelayInfo) hostty
 	return groupRatioInfo
 }
 
+// byokServiceFeePriceData builds the flat per-request pricing used when a
+// request is served by a user-supplied key. The fee is USD per request with no
+// group scaling; fee 0 makes the request free (no balance check, no charge).
+func byokServiceFeePriceData(info *relaycommon.RelayInfo) (hosttypes.PriceData, error) {
+	fee := byok_setting.GetServiceFeeUSD()
+	freeModel := fee <= 0
+	var quota int
+	if !freeModel {
+		q, err := common.QuotaFromFloatStrict(fee * common.QuotaPerUnit)
+		if err != nil {
+			return hosttypes.PriceData{}, err
+		}
+		quota = q
+	}
+	return hosttypes.PriceData{
+		FreeModel:         freeModel,
+		ModelPrice:        fee,
+		UsePrice:          true,
+		GroupRatioInfo:    hosttypes.GroupRatioInfo{GroupRatio: 1, GroupSpecialRatio: -1},
+		QuotaToPreConsume: quota,
+	}, nil
+}
+
 func ModelPriceHelper(c *gin.Context, info *relaycommon.RelayInfo, promptTokens int, meta *types.TokenCountMeta) (hosttypes.PriceData, error) {
 	if info != nil {
+		// BYOK attempt: the user's own credential served the request, so
+		// billing collapses to the flat per-request service fee regardless of
+		// model pricing (an unpriced model may legitimately be served by BYOK).
+		if common.GetContextKeyInt(c, constant.ContextKeyByokKeyId) > 0 {
+			priceData, err := byokServiceFeePriceData(info)
+			if err != nil {
+				return hosttypes.PriceData{}, err
+			}
+			info.PriceData = priceData
+			return priceData, nil
+		}
 		if matched := resolveBillingModelName(info.GetOriginModelName()); matched != "" && matched != info.OriginModelName {
 			info.BillingModelName = matched
 		}

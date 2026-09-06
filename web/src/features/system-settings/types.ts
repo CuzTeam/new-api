@@ -325,6 +325,8 @@ export type OperationsSettings = {
   DefaultCollapseSidebar: boolean
   DemoSiteEnabled: boolean
   SelfUseModeEnabled: boolean
+  ByokEnabled: boolean
+  ByokServiceFeeUSD: string
   QuotaRemindThreshold: string
   SMTPServer: string
   SMTPPort: string
